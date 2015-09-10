@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "codeswholesale/sdk": "1.0.*@beta"
+        "codeswholesale/sdk": "dev-master"
     },
     "autoload": {
         "psr-0": {
