@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-0": {
-            "CodesWholesale\\": "src/"
+            "CodesWholesaleFramework\\": ""
         }
     }
 }
