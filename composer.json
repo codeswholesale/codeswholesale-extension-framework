@@ -18,9 +18,8 @@
             "role": "Developer"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
-        "codeswholesale/sdk": "1.0.*@beta"
+        "codeswholesale/sdk": "@dev"
     },
     "autoload": {
         "psr-0": {
