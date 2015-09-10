@@ -18,12 +18,12 @@
             "role": "Developer"
         }
     ],
+    "require": {
+        "codeswholesale/sdk": "1.0.*@beta"
+    },
     "autoload": {
         "psr-0": {
             "CodesWholesale\\": "src/"
         }
-    },
-    "require": {
-    "codeswholesale/sdk": "1.0.*@beta"
     }
 }
