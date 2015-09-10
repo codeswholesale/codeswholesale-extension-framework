@@ -1,19 +1,29 @@
 {
-    "name": "wisoapp/cw-extension-framework",
-    "version": "master",
-    "source": {
-        "url": "https://MKlowan@bitbucket.org/wisoapp/cw-extension-framework.git",
-        "type": "git",
-        "reference":"master"
-    },
-    "repositories": [
+    "name": "codeswholesale/cw-extension-framework",
+    "type": "library",
+    "description": "The CodesWholesale Extension Framework",
+    "keywords": [
+        "codeswholesale",
+        "extension",
+        "plugin",
+        "api",
+        "games",
+        "cd-keys"],
+    "homepage": "https://github.com/codeswholesale/codeswholesale-extension-framework",
+    "license": "GPL 2.0",
+    "authors": [
         {
-            "type": "vcs",
-            "url": "https://MKlowan@bitbucket.org/wisoapp/cw-extension-framework.git"
+            "name": "CodesWholesale.com",
+            "email": "devteam@codeswholesale.com",
+            "role": "Developer"
         }
     ],
+    "autoload": {
+        "psr-0": {
+            "CodesWholesale\\": "src/"
+        }
+    },
     "require": {
-    	"codeswholesale/sdk": "1.0.*@beta",
-    	"wisoapp/cw-extension-framework": "dev-master"
+    "codeswholesale/sdk": "1.0.*@beta"
     }
 }
