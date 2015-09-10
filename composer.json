@@ -1,0 +1,19 @@
+{
+    "name": "wisoapp/cw-extension-framework",
+    "version": "master",
+    "source": {
+        "url": "https://MKlowan@bitbucket.org/wisoapp/cw-extension-framework.git",
+        "type": "git",
+        "reference":"master"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://MKlowan@bitbucket.org/wisoapp/cw-extension-framework.git"
+        }
+    ],
+    "require": {
+    	"codeswholesale/sdk": "1.0.*@beta",
+    	"wisoapp/cw-extension-framework": "dev-master"
+    }
+}
