@@ -67,6 +67,7 @@ class SendCodesAction implements Action
         $this->sendCodeMail->sendCodeMail($order, $attachments, $keys, $totalPreOrders);
     }
 
+
     public function process()
     {
         $attachments = array();
@@ -78,7 +79,6 @@ class SendCodesAction implements Action
 
         foreach ($orderDetails['orderedItems'] as $item_key => $item) {
 
-
             $links = $this->getLinks->links($item);
 
             $codes = array();
@@ -88,7 +88,6 @@ class SendCodesAction implements Action
                 foreach ($links as $link) {
 
                     $code = \CodesWholesale\Resource\Code::get($link);
-
 
                     if ($code->isImage()) {
 
@@ -110,8 +109,8 @@ class SendCodesAction implements Action
                 );
 
             }
-        }
 
+        }
 
         $this->sendMail($orderDetails['order'], $attachments, $keys, $totalPreOrders);
 
@@ -120,6 +119,9 @@ class SendCodesAction implements Action
         $this->cleanAttach($attachments);
     }
 
+    /**
+     * @param $attachments
+     */
     private function cleanAttach($attachments)
     {
         foreach ($attachments as $attachment) {
@@ -128,8 +130,5 @@ class SendCodesAction implements Action
                 unlink($attachment);
             }
         }
-
     }
-
-
 }

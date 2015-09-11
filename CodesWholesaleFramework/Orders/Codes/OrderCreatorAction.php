@@ -1,5 +1,6 @@
 <?php
 namespace CodesWholesaleFramework\Orders\Codes;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -129,7 +130,7 @@ class OrderCreatorAction implements Action
 
             try {
 
-                $mergedValues = array('item' => $item);
+                $mergedValues = array('item' => $item, 'order' => $orderDetails['order']);
 
                 $retrievedItems = $this->retrieveItem($mergedValues);
 
@@ -147,13 +148,12 @@ class OrderCreatorAction implements Action
                 $this->error->supportError($e, $orderDetails['order']);
                 $error = $e;
             }
+        }
 
-            $eventDataArray = $this->validatePurchase($orderedCodes, $item, $orderDetails, $this->connection, $error);
+        $eventDataArray = $this->validatePurchase($orderedCodes, $item, $orderDetails, $this->connection, $error);
 
-            if (!$eventDataArray == null) {
-                $this->dispatchEvent($eventDataArray);
-            }
-
+        if (!$eventDataArray == null) {
+            $this->dispatchEvent($eventDataArray);
         }
     }
 }
