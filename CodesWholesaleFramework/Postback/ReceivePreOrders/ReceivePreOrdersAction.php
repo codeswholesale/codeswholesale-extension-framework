@@ -62,7 +62,6 @@ class ReceivePreOrdersAction implements Action
 
             $allCodesFromProduct = \CodesWholesale\Resource\Order::getCodes($productOrdered);
 
-
             $orderId = $productOrdered->getOrderId();
 
             $item = $this->itemRetriever->retrieveItem($orderId);

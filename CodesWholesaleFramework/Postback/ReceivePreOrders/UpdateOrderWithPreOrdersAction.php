@@ -19,10 +19,8 @@ namespace CodesWholesaleFramework\Postback\ReceivePreOrders;
  */
 use CodesWholesaleFramework\Action;
 
-class UpdateOrderWithPreOrdersAction //implements Action
+class UpdateOrderWithPreOrdersAction implements Action
 {
-
-
     private $updateOrderWithPreOrders;
 
     /**
@@ -40,9 +38,11 @@ class UpdateOrderWithPreOrdersAction //implements Action
 
     public function process(){
 
-        $newKeys = $this->newKeys;
-
-        $textComment = 'PreOrder Codes to send: ' . ($newKeys[0]['total'] - $newKeys[0]['preOrdersLeft'] . '/' . $newKeys[0]['total']);
+        $data = $this->newKeys;
+        $event = $data->getEvent();
+        $newKeys = $event->get0();
+        file_put_contents('newKeys.txt', print_r($newKeys, true));
+        $textComment = 'PreOrder Codes to send: ' . ($newKeys['total'] - $newKeys['preOrdersLeft'] . '/' . $newKeys['total']);
 
         $this->updateOrderWithPreOrders->update($newKeys, $textComment);
     }

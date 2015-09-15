@@ -33,7 +33,7 @@ class NewKeysExtractorImpl implements NewKeysExtractorInterface
         $numberOfKeysSent = 0;
 
         $links = json_decode($item['links']);
-        $numberOfPreOrders = $item['number_of_preorders'];
+        $numberOfPreOrders = $item['number_of_preorder'];
 
         $preOrdersToRemove = NewKeysExtractorImpl::getIndicesOfPreOrders($links, $codes);
         $newCodes = NewKeysExtractorImpl::getNewCodes($links, $codes);
@@ -58,6 +58,7 @@ class NewKeysExtractorImpl implements NewKeysExtractorInterface
         }
 
         $preOrdersLeft = ($numberOfPreOrders - $numberOfKeysSent);
+
         $total = (count($links) + 1);
 
         $keys[] = array(
