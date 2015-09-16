@@ -79,7 +79,7 @@ class SendCodesAction implements Action
 
         foreach ($orderDetails['orderedItems'] as $item_key => $item) {
 
-            $links = $this->getLinks->links($item);
+            $links = $this->getLinks->links($item, $item_key);
 
             $codes = array();
 
@@ -107,9 +107,7 @@ class SendCodesAction implements Action
                     'item' => $item,
                     'codes' => $codes
                 );
-
             }
-
         }
 
         $this->sendMail($orderDetails['order'], $attachments, $keys, $totalPreOrders);

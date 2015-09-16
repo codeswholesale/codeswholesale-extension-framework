@@ -59,6 +59,7 @@ class UpdatePriceAndStockAction implements Action
             }
 
             $cwProductId = $this->connection->receiveUpdatedProductId();
+
         }
 
         try {

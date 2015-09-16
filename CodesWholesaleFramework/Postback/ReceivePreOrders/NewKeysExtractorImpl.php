@@ -33,8 +33,9 @@ class NewKeysExtractorImpl implements NewKeysExtractorInterface
         $numberOfKeysSent = 0;
 
         $links = json_decode($item['links']);
-        $numberOfPreOrders = $item['number_of_preorder'];
+        $numberOfPreOrders = $item['number_of_preorders'];
 
+        file_put_contents('item.txt', print_r($item, true));
         $preOrdersToRemove = NewKeysExtractorImpl::getIndicesOfPreOrders($links, $codes);
         $newCodes = NewKeysExtractorImpl::getNewCodes($links, $codes);
 

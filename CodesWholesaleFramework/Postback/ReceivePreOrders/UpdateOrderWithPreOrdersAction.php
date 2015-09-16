@@ -38,10 +38,8 @@ class UpdateOrderWithPreOrdersAction implements Action
 
     public function process(){
 
-        $data = $this->newKeys;
-        $event = $data->getEvent();
-        $newKeys = $event->get0();
-        file_put_contents('newKeys.txt', print_r($newKeys, true));
+        $newKeys = $this->newKeys;
+
         $textComment = 'PreOrder Codes to send: ' . ($newKeys['total'] - $newKeys['preOrdersLeft'] . '/' . $newKeys['total']);
 
         $this->updateOrderWithPreOrders->update($newKeys, $textComment);
