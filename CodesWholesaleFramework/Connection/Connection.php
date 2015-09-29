@@ -37,7 +37,10 @@ class Connection {
                 'cw.endpoint_uri' => $options['environment'] == 0 ? CodesWholesale::SANDBOX_ENDPOINT : CodesWholesale::LIVE_ENDPOINT,
                 'cw.client_id' => $options['environment'] == 0 ? self::SANDBOX_CLIENT_ID : $options['client_id'],
                 'cw.client_secret' => $options['environment'] == 0 ? self::SANDBOX_CLIENT_SECRET : $options['client_secret'],
-                'cw.token_storage' => new SessionStorage()
+                'cw.token_storage' => new SessionStorage(),
+                'cw.client.headers' => array(
+                    'User-Agent' => $options['client_headers']
+                )
             ));
 
             self::$connection = $builder->build();
