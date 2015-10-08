@@ -21,6 +21,7 @@ namespace CodesWholesaleFramework\Connection;
 
 use CodesWholesale\CodesWholesale;
 use CodesWholesale\ClientBuilder;
+use fkooman\OAuth\Client\PdoStorage;
 use fkooman\OAuth\Client\SessionStorage;
 
 class Connection {
@@ -32,12 +33,13 @@ class Connection {
 
     public static function getConnection($options)
     {
+
         if (self::$connection === null) {
             $builder = new ClientBuilder(array(
                 'cw.endpoint_uri' => $options['environment'] == 0 ? CodesWholesale::SANDBOX_ENDPOINT : CodesWholesale::LIVE_ENDPOINT,
                 'cw.client_id' => $options['environment'] == 0 ? self::SANDBOX_CLIENT_ID : $options['client_id'],
                 'cw.client_secret' => $options['environment'] == 0 ? self::SANDBOX_CLIENT_SECRET : $options['client_secret'],
-                'cw.token_storage' => new SessionStorage(),
+                'cw.token_storage' => new PdoStorage($options['db']),
                 'cw.client.headers' => array(
                     'User-Agent' => $options['client_headers']
                 )
