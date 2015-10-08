@@ -22,7 +22,7 @@ namespace CodesWholesaleFramework\Connection;
 use CodesWholesale\CodesWholesale;
 use CodesWholesale\ClientBuilder;
 use fkooman\OAuth\Client\PdoStorage;
-use fkooman\OAuth\Client\SessionStorage;
+
 
 class Connection {
 
