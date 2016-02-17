@@ -20,6 +20,6 @@ namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock;
 
 interface ProductUpdater{
 
-    function updateProduct($cwProductId, $quantity, $priceSpread);
+    function updateProduct($cwProductId, $quantity, $priceSpread, $price);
 
 }

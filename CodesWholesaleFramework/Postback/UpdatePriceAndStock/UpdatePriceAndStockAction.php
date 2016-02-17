@@ -76,7 +76,7 @@ class UpdatePriceAndStockAction implements Action
 
         $priceSpread = $this->spreadCalculator->calculateSpread($this->spreadParams->getSpreadParams(), $price);
 
-        $this->productUpdater->updateProduct($cwProductId, $quantity , $priceSpread);
+        $this->productUpdater->updateProduct($cwProductId, $quantity , $priceSpread, $price);
     }
 
     public function setConnection($connection)
