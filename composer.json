@@ -21,9 +21,12 @@
     "require": {
         "codeswholesale/sdk": "1.0.*@beta"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
     "autoload": {
-        "psr-0": {
-            "CodesWholesaleFramework\\": ""
+        "psr-4": {
+            "CodesWholesaleFramework\\": "src"
         }
     }
 }
