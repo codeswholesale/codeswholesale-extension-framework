@@ -100,9 +100,9 @@ class OrderCreatorAction implements Action
         return $orderedCodes;
     }
 
-    public function exportToDB($item, $orderedCodes, $item_key)
+    public function exportToDB($item, $orderedCodes, $item_key, $orderId)
     {
-        $this->exportToDataBase->export($item, $orderedCodes, $item_key);
+        $this->exportToDataBase->export($item, $orderedCodes, $item_key, $orderId);
     }
 
     public function dispatchEvent($eventDataArray)
@@ -136,7 +136,7 @@ class OrderCreatorAction implements Action
 
                 $orderedCodes = $this->purchase($retrievedItems['cwProductId'], $retrievedItems['qty']);
 
-                $this->exportToDB($item, $orderedCodes, $item_key);
+                $this->exportToDB($item, $orderedCodes, $item_key, $orderDetails['orderId']);
 
             } catch (\CodesWholesale\Resource\ResourceError $e) {
 
