@@ -19,5 +19,5 @@ namespace CodesWholesaleFramework\Orders\Utils;
  */
 interface DataBaseExporter{
 
-    function export($item, $orderDataArray, $item_key);
+    function export($item, $orderDataArray, $itemKey, $orderId);
 }
