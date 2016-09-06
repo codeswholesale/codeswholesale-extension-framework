@@ -27,6 +27,6 @@ namespace CodesWholesaleFramework\Postback\Retriever;
 
 interface SpreadRetriever {
 
-function getSpreadParams();
+function getSpreadParams($storeName);
 
 }
