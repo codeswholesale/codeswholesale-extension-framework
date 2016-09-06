@@ -155,5 +155,7 @@ class OrderCreatorAction implements Action
         if (!$eventDataArray == null) {
             $this->dispatchEvent($eventDataArray);
         }
+
+        return $error != null;
     }
 }
