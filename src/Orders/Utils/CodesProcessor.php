@@ -17,8 +17,6 @@ namespace CodesWholesaleFramework\Orders\Utils;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-interface StatusChangeInterface{
-
-    function checkStatus($observer);
-
+interface CodesProcessor {
+    public function process($orderedCodes);
 }

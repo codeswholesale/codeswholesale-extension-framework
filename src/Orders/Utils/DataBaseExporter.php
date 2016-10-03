@@ -18,6 +18,5 @@ namespace CodesWholesaleFramework\Orders\Utils;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 interface DataBaseExporter{
-
     function export($item, $orderDataArray, $itemKey, $orderId);
 }

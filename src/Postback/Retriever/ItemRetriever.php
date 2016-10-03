@@ -1,6 +1,6 @@
 <?php
-namespace CodesWholesaleFramework\Errors\Utils;
 
+namespace CodesWholesaleFramework\Postback\Retriever;
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -18,8 +18,7 @@ namespace CodesWholesaleFramework\Errors\Utils;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-interface ErrorHandlerInterface{
-
-    function handleError($e, $orderDetails);
+interface ItemRetriever
+{
+    function retrieveItem($orderId);
 }

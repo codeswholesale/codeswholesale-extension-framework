@@ -1,6 +1,5 @@
 <?php
-
-namespace CodesWholesaleFramework\Postback\Retriever;
+namespace CodesWholesaleFramework\Orders\Utils;
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -18,9 +17,6 @@ namespace CodesWholesaleFramework\Postback\Retriever;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-interface ItemRetrieverInterface
-{
-
-    function retrieveItem($orderId);
-
+interface OrderCreator{
+    function __construct($statusChange, $exportOrderToDataBase, $eventDispatcher, $itemRetriever, $errorHandler, $cwErrorHandler, $orderValidation);
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace CodesWholesaleFramework\Orders\Codes;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -18,38 +19,41 @@ namespace CodesWholesaleFramework\Orders\Codes;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-class PurchaseCode{
 
-    public function purchase($cwProductId, $qty){
+use \CodesWholesale\Resource\Product;
+use \CodesWholesale\Resource\Order;
 
-
-        $cwProduct = \CodesWholesale\Resource\Product::get($cwProductId);
-
-        $codes = \CodesWholesale\Resource\Order::createBatchOrder($cwProduct, array('quantity' => $qty));
+class PurchaseCode
+{
+    /**
+     * @param $cwProductId
+     * @param $qty
+     * @return array
+     */
+    public function purchase($cwProductId, $qty)
+    {
+        $cwProduct = Product::get($cwProductId);
+        $codes = Order::createBatchOrder($cwProduct, ['quantity' => $qty]);
 
         $cwOrderId = $codes->getOrderId();
 
-        $preOrders = 0;
-        $links = array();
+        $numberOfPreOrders = 0;
+        $links = [];
 
         foreach ($codes as $code) {
 
             if ($code->isPreOrder()) {
-
-                $preOrders++;
+                $numberOfPreOrders++;
             }
 
             $links[] = $code->getHref();
         }
 
-        $orderedCodesArray = array(
+        return [
             'cwOrderId' => $cwOrderId,
             'links' => $links,
-            'preOrders' => $preOrders
-        );
-
-        return $orderedCodesArray;
-
+            'numberOfPreOrders' => $numberOfPreOrders
+        ];
     }
 
 }

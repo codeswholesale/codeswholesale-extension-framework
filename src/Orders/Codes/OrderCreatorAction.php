@@ -19,20 +19,27 @@ namespace CodesWholesaleFramework\Orders\Codes;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 use CodesWholesaleFramework\Action;
-use CodesWholesaleFramework\Orders\Utils\OrderCreatorInterface;
-use CodesWholesaleFramework\Orders\Codes\PurchaseCode;
+use CodesWholesaleFramework\Connection\Connection;
+use CodesWholesaleFramework\Errors\ErrorHandler;
+use CodesWholesaleFramework\Orders\Utils\CodesProcessor;
+use CodesWholesaleFramework\Orders\Utils\DataBaseExporter;
 use CodesWholesaleFramework\Errors\Errors;
+use CodesWholesaleFramework\Orders\Utils\StatusService;
+use CodesWholesaleFramework\Orders\Validator;
+use CodesWholesaleFramework\Postback\ReceivePreOrders\EventDispatcher;
+use CodesWholesaleFramework\Postback\Retriever\ItemRetriever;
+use \CodesWholesale\Resource\ResourceError;
 
 class OrderCreatorAction implements Action
 {
     /**
-     * @var StatusChange
+     * @var StatusService
      */
-    private $statusChange;
+    private $statusService;
     /**
-     * @var ExportToDataBase
+     * @var DataBaseExporter
      */
-    private $exportToDataBase;
+    private $databaseExporter;
     /**
      * @var EventDispatcher
      */
@@ -40,7 +47,7 @@ class OrderCreatorAction implements Action
     /**
      * @var PurchaseCode
      */
-    private $purchaseCode;
+    private $codesPurchaser;
     /**
      * @var ItemRetriever
      */
@@ -50,111 +57,85 @@ class OrderCreatorAction implements Action
      */
     private $sendErrorMail;
     /**
-     * @var CwErrorHandler
+     * @var ErrorHandler
      */
     private $sendCwErrorMail;
     /**
-     * @var OrderValidation
+     * @var CodesProcessor
      */
-    private $orderValidation;
+    private $codesProcessor;
     /**
      * @var Connection
      */
     private $connection;
 
-    private $observer;
+    private $status;
 
-    private $error;
+    /**
+     * @var Validator
+     */
+    private $balanceValidator;
 
-    public function __construct($statusChange, $exportOrderToDataBase, $eventDispatcher, $itemRetriever, $sendErrorMail, $sendCwErrorMail, $orderValidation)
+    /**
+     * @var Errors
+     */
+    private $errorHandler;
+
+    public function __construct(StatusService $statusService, DataBaseExporter $dataBaseExporter, EventDispatcher $eventDispatcher,
+                                ItemRetriever $itemRetriever, ErrorHandler $sendErrorMail, ErrorHandler $sendCwErrorMail,
+                                CodesProcessor $codesProcessor, Connection $connection, Validator $validator)
     {
-        $this->statusChange = $statusChange;
-        $this->exportToDataBase = $exportOrderToDataBase;
+        $this->statusService = $statusService;
+        $this->databaseExporter = $dataBaseExporter;
         $this->eventDispatcher = $eventDispatcher;
-        $this->purchaseCode = new PurchaseCode();
+        $this->codesPurchaser = new PurchaseCode();
         $this->itemRetriever = $itemRetriever;
         $this->sendErrorMail = $sendErrorMail;
         $this->sendCwErrorMail = $sendCwErrorMail;
-        $this->orderValidation = $orderValidation;
-        $this->error = new Errors($this->sendErrorMail, $this->sendCwErrorMail);
-    }
-
-    public function setCurrentStatus($observer)
-    {
-        $this->observer = $observer;
-    }
-
-    public function getCurrentStatus()
-    {
-        return $this->statusChange->checkStatus($this->observer);
-    }
-
-    public function retrieveItem($orderData)
-    {
-        return $this->itemRetriever->retrieveItem($orderData);
-    }
-
-    public function purchase($cwProductId, $qty)
-    {
-        $orderedCodes = $this->purchaseCode->purchase($cwProductId, $qty);
-        return $orderedCodes;
-    }
-
-    public function exportToDB($item, $orderedCodes, $item_key, $orderId)
-    {
-        $this->exportToDataBase->export($item, $orderedCodes, $item_key, $orderId);
-    }
-
-    public function dispatchEvent($eventDataArray)
-    {
-        $this->eventDispatcher->dispatchEvent($eventDataArray);
-    }
-
-    public function validatePurchase($orderedCodes, $item, $orderDetails, $connection, $error)
-    {
-        return $this->orderValidation->validatePurchase($orderedCodes, $item, $orderDetails, $connection, $error);
-    }
-
-    public function setConnection($connection)
-    {
+        $this->codesProcessor = $codesProcessor;
+        $this->errorHandler = new Errors($this->sendErrorMail, $this->sendCwErrorMail);
         $this->connection = $connection;
+        $this->balanceValidator = $validator;
+    }
+
+    public function setCurrentStatus($status)
+    {
+        $this->status = $status;
     }
 
     public function process()
     {
         $error = null;
 
-        $orderDetails = $this->getCurrentStatus();
+        $orderDetails = $this->statusService->checkStatus($this->status);
 
-        foreach ($orderDetails['orderedItems'] as $item_key => $item) {
+        foreach ($orderDetails['orderedItems'] as $itemKey => $item) {
 
             try {
 
-                $mergedValues = array('item' => $item, 'order' => $orderDetails['order']);
+                $retrievedItems = $this->itemRetriever->retrieveItem([
+                    'item' => $item,
+                    'order' => $orderDetails['order']
+                ]);
 
-                $retrievedItems = $this->retrieveItem($mergedValues);
+                $orderedCodes = $this->codesPurchaser->purchase($retrievedItems['cwProductId'], $retrievedItems['qty']);
 
-                $orderedCodes = $this->purchase($retrievedItems['cwProductId'], $retrievedItems['qty']);
+                if($orderedCodes['numberOfPreOrders'] > 0) {
+                    $this->codesProcessor->process($orderedCodes);
+                }
 
-                $this->exportToDB($item, $orderedCodes, $item_key, $orderDetails['orderId']);
+                $this->databaseExporter->export($item, $orderedCodes, $itemKey, $orderDetails['orderId']);
 
-            } catch (\CodesWholesale\Resource\ResourceError $e) {
-
-                $this->error->supportResourceError($e, $orderDetails['order']);
+            } catch (ResourceError $e) {
+                $this->errorHandler->supportResourceError($e, $orderDetails['order']);
                 $error = $e;
-
             } catch (\Exception $e) {
-
-                $this->error->supportError($e, $orderDetails['order']);
+                $this->errorHandler->supportError($e, $orderDetails['order']);
                 $error = $e;
             }
         }
 
-        $eventDataArray = $this->validatePurchase($orderedCodes, $item, $orderDetails, $this->connection, $error);
-
-        if (!$eventDataArray == null) {
-            $this->dispatchEvent($eventDataArray);
-        }
+        $this->eventDispatcher->dispatchEvent([]);
 
         return $error != null;
     }
