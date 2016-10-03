@@ -121,7 +121,7 @@ class OrderCreatorAction implements Action
                 $orderedCodes = $this->codesPurchaser->purchase($retrievedItems['cwProductId'], $retrievedItems['qty']);
 
                 if($orderedCodes['numberOfPreOrders'] > 0) {
-                    $this->codesProcessor->process($orderedCodes);
+                    $this->codesProcessor->process($orderedCodes, $orderDetails['order']);
                 }
 
                 $this->databaseExporter->export($item, $orderedCodes, $itemKey, $orderDetails['orderId']);
