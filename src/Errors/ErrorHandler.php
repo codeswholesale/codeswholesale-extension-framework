@@ -20,5 +20,5 @@ namespace CodesWholesaleFramework\Errors;
  */
 
 interface ErrorHandler{
-    function handleError($e, $orderDetails);
+    function handleError($order, $title, $e);
 }

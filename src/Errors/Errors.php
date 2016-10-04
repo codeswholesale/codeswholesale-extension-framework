@@ -21,11 +21,17 @@ namespace CodesWholesaleFramework\Errors;
 
 class Errors
 {
+    /**
+     * @var ErrorHandler
+     */
     private $sendAdminErrorMail;
 
+    /**
+     * @var ErrorHandler
+     */
     private $sendAdminGeneralErrorMail;
 
-    public function __construct($sendAdminErrorMail, $sendAdminGeneralErrorMail)
+    public function __construct(ErrorHandler $sendAdminErrorMail, ErrorHandler $sendAdminGeneralErrorMail)
     {
 
         $this->sendAdminErrorMail = $sendAdminErrorMail;
@@ -40,28 +46,28 @@ class Errors
 
         if ($e->isInvalidToken()) {
 
-            $this->sendAdminErrorMail->sendAdminErrorMail($order, 'Invalid token', $e);
+            $this->sendAdminErrorMail->handleError($order, 'Invalid token', $e);
         } else
 
             // handle scenario when account's balance is not enough to make order
             if ($e->getStatus() == 400 && $e->getErrorCode() == 10002) {
 
-                $this->sendAdminErrorMail->sendAdminErrorMail($order, 'Balance too low', $e);
+                $this->sendAdminErrorMail->handleError($order, 'Balance too low', $e);
             } else
                 // handle scenario when code details where not found
                 if ($e->getStatus() == 404 && $e->getErrorCode() == 50002) {
 
-                    $this->sendAdminErrorMail->sendAdminErrorMail($order, 'Code not found', $e);
+                    $this->sendAdminErrorMail->handleError($order, 'Code not found', $e);
                 } else
                     // handle scenario when product was not found in price list
                     if ($e->getStatus() == 404 && $e->getErrorCode() == 20001) {
 
-                        $this->sendAdminErrorMail->sendAdminErrorMail($order, 'Product not found', $e);
+                        $this->sendAdminErrorMail->handleError($order, 'Product not found', $e);
                     } else
                         // handle when quantity was less then 1
                         if ($e->getStatus() == 400 && $e->getErrorCode() == 40002) {
 
-                            $this->sendAdminErrorMail->sendAdminErrorMail($order, 'Quantity less then 1', $e);
+                            $this->sendAdminErrorMail->handleError($order, 'Quantity less then 1', $e);
                         } else {
                             $this->supportError($e, $order);
                         }
@@ -72,8 +78,7 @@ class Errors
      */
     public function supportError($e, $order)
     {
-
-        return $this->sendAdminGeneralErrorMail->sendAdminErrorMail($order, 'Issue', $e);
+        return $this->sendAdminGeneralErrorMail->handleError($order, 'Issue', $e);
     }
 
 
