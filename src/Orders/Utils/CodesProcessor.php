@@ -18,5 +18,5 @@ namespace CodesWholesaleFramework\Orders\Utils;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 interface CodesProcessor {
-    public function process($orderedCodes, $order);
+    public function process($order);
 }

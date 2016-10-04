@@ -18,14 +18,13 @@ namespace CodesWholesaleFramework\Orders\Codes;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+use CodesWholesale\Client;
 use CodesWholesaleFramework\Action;
-use CodesWholesaleFramework\Connection\Connection;
 use CodesWholesaleFramework\Errors\ErrorHandler;
 use CodesWholesaleFramework\Orders\Utils\CodesProcessor;
 use CodesWholesaleFramework\Orders\Utils\DataBaseExporter;
 use CodesWholesaleFramework\Errors\Errors;
 use CodesWholesaleFramework\Orders\Utils\StatusService;
-use CodesWholesaleFramework\Orders\Validator;
 use CodesWholesaleFramework\Postback\ReceivePreOrders\EventDispatcher;
 use CodesWholesaleFramework\Postback\Retriever\ItemRetriever;
 use \CodesWholesale\Resource\ResourceError;
@@ -64,17 +63,10 @@ class OrderCreatorAction implements Action
      * @var CodesProcessor
      */
     private $codesProcessor;
-    /**
-     * @var Connection
-     */
-    private $connection;
 
     private $status;
 
-    /**
-     * @var Validator
-     */
-    private $balanceValidator;
+    private $client;
 
     /**
      * @var Errors
@@ -83,7 +75,7 @@ class OrderCreatorAction implements Action
 
     public function __construct(StatusService $statusService, DataBaseExporter $dataBaseExporter, EventDispatcher $eventDispatcher,
                                 ItemRetriever $itemRetriever, ErrorHandler $sendErrorMail, ErrorHandler $sendCwErrorMail,
-                                CodesProcessor $codesProcessor, Connection $connection, Validator $validator)
+                                CodesProcessor $codesProcessor, Client $client)
     {
         $this->statusService = $statusService;
         $this->databaseExporter = $dataBaseExporter;
@@ -94,8 +86,7 @@ class OrderCreatorAction implements Action
         $this->sendCwErrorMail = $sendCwErrorMail;
         $this->codesProcessor = $codesProcessor;
         $this->errorHandler = new Errors($this->sendErrorMail, $this->sendCwErrorMail);
-        $this->connection = $connection;
-        $this->balanceValidator = $validator;
+        $this->client = $client;
     }
 
     public function setCurrentStatus($status)
@@ -106,6 +97,7 @@ class OrderCreatorAction implements Action
     public function process()
     {
         $error = null;
+        $numberOfPreOrders = 0;
 
         $orderDetails = $this->statusService->checkStatus($this->status);
 
@@ -121,7 +113,7 @@ class OrderCreatorAction implements Action
                 $orderedCodes = $this->codesPurchaser->purchase($retrievedItems['cwProductId'], $retrievedItems['qty']);
 
                 if($orderedCodes['numberOfPreOrders'] > 0) {
-                    $this->codesProcessor->process($orderedCodes, $orderDetails['order']);
+                    $numberOfPreOrders++;
                 }
 
                 $this->databaseExporter->export($item, $orderedCodes, $itemKey, $orderDetails['orderId']);
@@ -135,7 +127,11 @@ class OrderCreatorAction implements Action
             }
         }
 
-        $this->eventDispatcher->dispatchEvent([]);
+        if($numberOfPreOrders > 0) {
+            $this->codesProcessor->process($orderDetails['order']);
+        }
+
+        $this->eventDispatcher->dispatchEvent($orderDetails);
 
         return $error != null;
     }
