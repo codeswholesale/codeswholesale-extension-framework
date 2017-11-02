@@ -8,8 +8,13 @@
 
 namespace CodesWholesaleFramework\Orders;
 
-
+/**
+ * Interface Validator
+ */
 interface Validator
 {
+    /**
+     * @return mixed
+     */
     public function validate();
 }

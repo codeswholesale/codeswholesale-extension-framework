@@ -20,10 +20,14 @@ namespace CodesWholesaleFramework\Postback\ReceivePreOrders;
  */
 use CodesWholesaleFramework\Postback\Extractor\NewKeysExtractorInterface;
 
+/**
+ * Class NewKeysExtractorImpl
+ */
 class NewKeysExtractorImpl implements NewKeysExtractorInterface
 {
     /**
      * @param $observer
+     *
      * @return array
      */
     public function extract($observer){
@@ -77,6 +81,7 @@ class NewKeysExtractorImpl implements NewKeysExtractorInterface
     /**
      * @param $links
      * @param $codes
+     *
      * @return array
      */
     private static function getIndicesOfPreOrders($links, $codes)
@@ -103,6 +108,7 @@ class NewKeysExtractorImpl implements NewKeysExtractorInterface
     /**
      * @param $links
      * @param $codes
+     *
      * @return array
      */
     private static function getNewCodes($links, $codes)

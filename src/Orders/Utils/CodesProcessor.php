@@ -1,5 +1,9 @@
 <?php
+
 namespace CodesWholesaleFramework\Orders\Utils;
+
+use CodesWholesaleFramework\Model\InternalOrder;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -17,6 +21,7 @@ namespace CodesWholesaleFramework\Orders\Utils;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-interface CodesProcessor {
-    public function process($order);
+interface CodesProcessor
+{
+    public function process(InternalOrder $internalOrder, $numberOfPreOrders, $error, $item);
 }

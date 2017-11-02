@@ -24,7 +24,16 @@ namespace CodesWholesaleFramework\Postback\ReceivePreOrders\Utils;
  * Time: 14:12
  */
 
-interface PreOrderReceiverInterface{
-
-    function __construct($itemRetriever, $sendPreOrderDispatcher);
+/**
+ * Interface PreOrderReceiverInterface
+ */
+interface PreOrderReceiverInterface
+{
+    /**
+     * PreOrderReceiverInterface constructor.
+     *
+     * @param $itemRetriever
+     * @param $sendPreOrderDispatcher
+     */
+    public function __construct($itemRetriever, $sendPreOrderDispatcher);
 }

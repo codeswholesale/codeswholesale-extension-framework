@@ -1,6 +1,7 @@
 <?php
 
 namespace CodesWholesaleFramework\Postback\Retriever;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -20,5 +21,5 @@ namespace CodesWholesaleFramework\Postback\Retriever;
  */
 interface ItemRetriever
 {
-    function retrieveItem($orderId);
+    public function retrieveItem($orderId);
 }

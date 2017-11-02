@@ -19,6 +19,9 @@ namespace CodesWholesaleFramework\Orders\Codes;
  */
 use CodesWholesaleFramework\Action;
 
+/**
+ * Class SendCodesAction
+ */
 class SendCodesAction implements Action
 {
     /**

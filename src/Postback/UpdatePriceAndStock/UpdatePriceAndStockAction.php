@@ -19,6 +19,7 @@ namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 use CodesWholesaleFramework\Action;
+use CodesWholesaleFramework\Postback\Retriever\SpreadRetriever;
 use CodesWholesaleFramework\PostBack\UpdatePriceAndStock\Utils\UpdatePriceAndStockInterface;
 use CodesWholesaleFramework\Postback\UpdatePriceAndStock\SpreadCalculator;
 
@@ -33,11 +34,20 @@ class UpdatePriceAndStockAction implements Action
 
     private $cwProductId;
 
+    /**
+     * @var SpreadRetriever
+     */
     private $spreadParams;
 
     private $spreadCalculator;
 
 
+    /**
+     * UpdatePriceAndStockAction constructor.
+     *
+     * @param $productUpdater
+     * @param SpreadRetriever $spreadParams
+     */
     public function __construct($productUpdater, $spreadParams)
     {
         $this->productUpdater = $productUpdater;
@@ -74,7 +84,7 @@ class UpdatePriceAndStockAction implements Action
         $quantity = $product->getStockQuantity();
         $price = $product->getLowestPrice();
 
-        $priceSpread = $this->spreadCalculator->calculateSpread($this->spreadParams->getSpreadParams(), $price);
+        $priceSpread = $this->spreadCalculator->calculateSpread($this->spreadParams->getSpreadParams(''), $price);
 
         $this->productUpdater->updateProduct($cwProductId, $quantity , $priceSpread, $price);
     }

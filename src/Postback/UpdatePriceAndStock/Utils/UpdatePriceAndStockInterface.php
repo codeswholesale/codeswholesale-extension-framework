@@ -1,6 +1,7 @@
 <?php
 
 namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock\Utils;
+
 /**
  * Created by PhpStorm.
  * User: maciejklowan
@@ -25,7 +26,7 @@ namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock\Utils;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface UpdatePriceAndStockInterface{
-    
-    function updateProduct($cwProductId, $quantity , $priceSpread);
+interface UpdatePriceAndStockInterface
+{
+    public function updateProduct($cwProductId, $quantity , $priceSpread);
 }

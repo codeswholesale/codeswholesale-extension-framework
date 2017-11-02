@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "codeswholesale/sdk": "1.0.*@beta"
+        "codeswholesale/sdk": "1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"

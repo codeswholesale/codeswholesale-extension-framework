@@ -1,5 +1,7 @@
 <?php
+
 namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -17,13 +19,22 @@ namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+
 use CodesWholesaleFramework\Postback\UpdatePriceAndStock\Utils\SpreadCalculatorInterface;
 
+/**
+ * Class SpreadCalculator
+ */
 class SpreadCalculator implements SpreadCalculatorInterface
 {
+    /**
+     * @param array $spreadParams
+     * @param float $price
+     *
+     * @return float|mixed
+     */
     public function calculateSpread(array $spreadParams, $price)
     {
-
         if ($spreadParams['cwSpreadType'] == 0) {
 
             $priceSpread = $price + $spreadParams['cwSpread'];

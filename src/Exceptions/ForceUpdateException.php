@@ -8,7 +8,13 @@
 
 namespace CodesWholesaleFramework\Exceptions;
 
+/**
+ * Class ForceUpdateException
+ */
 class ForceUpdateException extends \Exception
 {
+    /**
+     * @var string
+     */
    protected $message = 'Issue in ForceProductUpdater';
 }

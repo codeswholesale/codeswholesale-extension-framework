@@ -1,4 +1,8 @@
 <?php
+
+use CodesWholesale\Resource\Product;
+use CodesWholesale\Resource\Order;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -18,13 +22,12 @@
  */
 class OrderCreator
 {
-
-    public function createOrder($cwProductId, $item_qty)
+    public function createOrder($cwProductId, $item_qty): array
     {
         $preOrdersPerItem = 0;
 
-        $cwProduct = \CodesWholesale\Resource\Product::get($cwProductId);
-        $codes = \CodesWholesale\Resource\Order::createBatchOrder($cwProduct, array('quantity' => $item_qty));
+        $cwProduct = Product::get($cwProductId);
+        $codes = Order::createBatchOrder($cwProduct, ['quantity' => $item_qty]);
 
         foreach ($codes as $code) {
 
@@ -35,11 +38,11 @@ class OrderCreator
 
             $links[] = $code->getHref();
         }
-        $createdOrderArray = array(
+        $createdOrderArray = [
             'counted_pre_orders' => $preOrdersPerItem,
             'links' => $links,
             'codes' => $codes
-        );
+        ];
 
         return $createdOrderArray;
 

@@ -8,18 +8,15 @@
 
 namespace CodesWholesaleFramework\Orders;
 
-use CodesWholesaleFramework\Connection\Connection;
-
+/**
+ * Class BalanceValidator
+ */
 class BalanceValidator implements Validator
 {
-
     /**
-     * @param $balance
+     * validate
      */
-    public function validate($balance)
+    public function validate()
     {
-
-
-
     }
 }
