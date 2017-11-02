@@ -20,9 +20,12 @@ namespace CodesWholesaleFramework\Orders\Codes;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-use \CodesWholesale\Resource\Product;
-use \CodesWholesale\Resource\Order;
+use CodesWholesale\Resource\Product;
+use CodesWholesale\Resource\Order;
 
+/**
+ * Class PurchaseCode
+ */
 class PurchaseCode
 {
     /**

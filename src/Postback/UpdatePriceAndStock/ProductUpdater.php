@@ -1,5 +1,7 @@
 <?php
+
 namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -17,9 +19,8 @@ namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-interface ProductUpdater{
-
-    function updateProduct($cwProductId, $quantity, $priceSpread, $price);
+interface ProductUpdater
+{
+    public function updateProduct($cwProductId, $quantity, $priceSpread, $price);
 
 }

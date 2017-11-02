@@ -18,13 +18,17 @@ namespace CodesWholesaleFramework\Postback\ReceivePreOrders;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 use CodesWholesaleFramework\Action;
+use CodesWholesaleFramework\Postback\ReceivePreOrders\Utils\UpdateOrderWithPreOrdersInterface;
 
 class UpdateOrderWithPreOrdersAction implements Action
 {
+    /**
+     * @var UpdateOrderWithPreOrdersInterface
+     */
     private $updateOrderWithPreOrders;
 
     /**
-     * @var NewKeys
+     * @var mixed
      */
     private $newKeys;
 

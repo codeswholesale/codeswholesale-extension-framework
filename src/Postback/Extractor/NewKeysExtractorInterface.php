@@ -24,7 +24,15 @@ namespace CodesWholesaleFramework\Postback\Extractor;
  * Time: 15:59
  */
 
-interface NewKeysExtractorInterface{
-
+/**
+ * Interface NewKeysExtractorInterface
+ */
+interface NewKeysExtractorInterface
+{
+    /**
+     * @param $params
+     *
+     * @return mixed
+     */
     function extract($params);
 }

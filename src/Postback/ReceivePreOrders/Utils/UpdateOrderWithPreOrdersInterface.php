@@ -19,7 +19,13 @@ namespace CodesWholesaleFramework\Postback\ReceivePreOrders\Utils;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface UpdateOrderWithPreOrdersInterface{
-
-    function update($newKeys, $textComment);
+interface UpdateOrderWithPreOrdersInterface
+{
+    /**
+     * @param $newKeys
+     * @param $textComment
+     *
+     * @return mixed
+     */
+    public function update($newKeys, $textComment);
 }

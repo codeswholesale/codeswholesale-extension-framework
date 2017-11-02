@@ -1,4 +1,5 @@
 <?php
+
 namespace CodesWholesaleFramework\Errors;
 
 /**
@@ -19,6 +20,15 @@ namespace CodesWholesaleFramework\Errors;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface ErrorHandler{
-    function handleError($order, $title, $e);
+/**
+ * Interface ErrorHandler
+ */
+interface ErrorHandler
+{
+    /**
+     * @param            $order
+     * @param string     $title
+     * @param \Exception $e
+     */
+    function handleError($order, string $title, \Exception $e);
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace CodesWholesaleFramework\Connection;
 
 /**
@@ -21,36 +22,51 @@ namespace CodesWholesaleFramework\Connection;
 
 use CodesWholesale\CodesWholesale;
 use CodesWholesale\ClientBuilder;
-use fkooman\OAuth\Client\PdoStorage;
+use \CodesWholesale\Client;
+use CodesWholesale\Storage\TokenSessionStorage;
 
-
-class Connection {
+/**
+ * Class Connection
+ */
+class Connection
+{
 
     const SANDBOX_CLIENT_ID = 'ff72ce315d1259e822f47d87d02d261e';
     const SANDBOX_CLIENT_SECRET = '$2a$10$E2jVWDADFA5gh6zlRVcrlOOX01Q/HJoT6hXuDMJxek.YEo.lkO2T6';
 
+    /**
+     * @var Client|null
+     */
     private static $connection;
 
-    public static function getConnection($options)
+    /**
+     * @param array $options
+     *
+     * @return Client
+     */
+    public static function getConnection(array $options): Client
     {
 
         if (self::$connection === null) {
-            $builder = new ClientBuilder(array(
+            $builder = new ClientBuilder([
                 'cw.endpoint_uri' => $options['environment'] == 0 ? CodesWholesale::SANDBOX_ENDPOINT : CodesWholesale::LIVE_ENDPOINT,
                 'cw.client_id' => $options['environment'] == 0 ? self::SANDBOX_CLIENT_ID : $options['client_id'],
                 'cw.client_secret' => $options['environment'] == 0 ? self::SANDBOX_CLIENT_SECRET : $options['client_secret'],
-                'cw.token_storage' => new PdoStorage($options['db']),
-                'cw.client.headers' => array(
-                    'User-Agent' => $options['client_headers']
-                )
-            ));
+                'cw.token_storage' => new TokenSessionStorage(),
+                'cw.client.headers' => [
+                    'User-Agent' => $options['client_headers'],
+                ]
+            ]);
 
             self::$connection = $builder->build();
         }
         return self::$connection;
     }
 
-    public static function hasConnection() {
+    /**
+     * @return bool
+     */
+    public static function hasConnection(): bool{
         return self::$connection != null;
     }
 }

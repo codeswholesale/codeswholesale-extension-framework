@@ -7,6 +7,7 @@
  */
 
 namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock\Utils;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -25,8 +26,8 @@ namespace CodesWholesaleFramework\Postback\UpdatePriceAndStock\Utils;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-interface SpreadCalculatorInterface {
-
-    function calculateSpread(array $spreadParams, $price);
+interface SpreadCalculatorInterface
+{
+    public function calculateSpread(array $spreadParams, $price);
 
 }

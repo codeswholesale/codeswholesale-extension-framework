@@ -10,7 +10,9 @@ namespace CodesWholesaleFramework\Updaters;
 
 use CodesWholesale\Resource\ProductList;
 use CodesWholesaleFramework\Exceptions\ForceUpdateException;
+use CodesWholesaleFramework\Postback\UpdatePriceAndStock\ProductUpdater;
 use CodesWholesaleFramework\Postback\UpdatePriceAndStock\SpreadCalculator;
+use CodesWholesaleFramework\Postback\UpdatePriceAndStock\Utils\UpdatePriceAndStockInterface;
 
 /**
  * Class ForceUpdater
@@ -35,6 +37,9 @@ class ForceUpdater
 
     private $productList;
 
+    /**
+     * @var ProductUpdater
+     */
     private $stockAndPriceUpdater;
     
     /**
@@ -69,12 +74,15 @@ class ForceUpdater
             $cwPriceListMap = $this->mapCwPriceList();
 
             foreach ($this->productList as $product) {
-
                 $productData = $cwPriceListMap[$product->getCwProductId()];
-                $this->stockAndPriceUpdater->updateProduct($product->getCwProductId(), $productData['stock'],
+
+                $this->stockAndPriceUpdater->updateProduct(
+                    $product->getCwProductId(),
+                    $productData['stock'],
                     $this->spreadCalculator->calculateSpread($this->spreadParams, $productData['price']),
                     $this->storeName
                 );
+
                 $updatedProducts++;
             }
 
