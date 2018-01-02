@@ -22,6 +22,7 @@ namespace CodesWholesaleFramework\Orders\Codes;
 
 use CodesWholesale\Resource\Product;
 use CodesWholesale\Resource\Order;
+use CodesWholesaleFramework\Orders\Utils\DataBaseExporter;
 
 /**
  * Class PurchaseCode
@@ -29,34 +30,41 @@ use CodesWholesale\Resource\Order;
 class PurchaseCode
 {
     /**
-     * @param $cwProductId
-     * @param $qty
-     * @return array
+     * @param array            $productsToBuy
+     * @param array            $productIds
+     * @param DataBaseExporter $exporter
+     * @param int              $internalOrderId
+     *
+     * @return int
      */
-    public function purchase($cwProductId, $qty)
+    public function purchase(array $productsToBuy, array $productIds, DataBaseExporter $exporter, int $internalOrderId): int
     {
-        $cwProduct = Product::get($cwProductId);
-        $codes = Order::createBatchOrder($cwProduct, ['quantity' => $qty]);
+        $preOrdersCount = 0;
+        $order = Order::createOrder($productsToBuy, $internalOrderId, true);
 
-        $cwOrderId = $codes->getOrderId();
+        foreach ($order->getProducts() as $product) {
+            $numberOfPreOrders = 0;
+            $links = [];
 
-        $numberOfPreOrders = 0;
-        $links = [];
+            foreach ($product->getCodes() as $code) {
 
-        foreach ($codes as $code) {
+                if ($code->isPreOrder()) {
+                    $numberOfPreOrders++;
+                    $preOrdersCount++;
+                }
 
-            if ($code->isPreOrder()) {
-                $numberOfPreOrders++;
+                $links[] = $code->getCodeId();
             }
 
-            $links[] = $code->getHref();
+            $orderedCodes = [
+                'cwOrderId' => $order->getOrderId(),
+                'links' => $links,
+                'preOrders' => $numberOfPreOrders
+            ];
+
+            $exporter->export(null, $orderedCodes, $productIds[$product->getProductId()], $internalOrderId);
         }
 
-        return [
-            'cwOrderId' => $cwOrderId,
-            'links' => $links,
-            'numberOfPreOrders' => $numberOfPreOrders
-        ];
+        return $preOrdersCount;
     }
-
 }

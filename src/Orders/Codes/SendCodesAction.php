@@ -1,4 +1,5 @@
 <?php
+
 namespace CodesWholesaleFramework\Orders\Codes;
 /**
  *   This file is part of codeswholesale-plugin-framework.
@@ -17,7 +18,13 @@ namespace CodesWholesaleFramework\Orders\Codes;
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
+use CodesWholesale\Resource\Code;
+use CodesWholesale\Util\Base64Writer;
 use CodesWholesaleFramework\Action;
+use CodesWholesaleFramework\Dispatcher\OrderNotificationDispatcher;
+use CodesWholesaleFramework\Mailer\SendCodeMailer;
+use CodesWholesaleFramework\Provider\OrderDetailsProvider;
+use CodesWholesaleFramework\Retriever\LinkRetriever;
 
 /**
  * Class SendCodesAction
@@ -25,51 +32,48 @@ use CodesWholesaleFramework\Action;
 class SendCodesAction implements Action
 {
     /**
-     * @var
+     * @var OrderDetailsProvider
+     */
+    private $orderDetailsProvider;
+
+    /**
+     * @var SendCodeMailer
+     */
+    private $sendCodeMailer;
+
+    /**
+     * @var OrderNotificationDispatcher
+     */
+    private $orderNotificationDispatcher;
+
+    /**
+     * @var LinkRetriever
+     */
+    private $linkRetriever;
+
+    /**
+     * @var array
      */
     private $orderDetails;
-    /**
-     * @var
-     */
-    private $sendCodeMail;
-    /**
-     * @var
-     */
-    private $setStatus;
-    /**
-     * @var
-     */
-    private $observerDispatcher;
-
-    private $getLinks;
 
 
-    public function __construct($observerDispatcher, $sendCodeMail, $setStatus, $getLinks)
+    public function __construct(
+        OrderDetailsProvider $orderDetailsProvider,
+        SendCodeMailer $sendCodeMailer,
+        OrderNotificationDispatcher $orderNotificationDispatcher,
+        LinkRetriever $linkRetriever
+    )
     {
-        $this->observerDispatcher = $observerDispatcher;
-        $this->sendCodeMail = $sendCodeMail;
-        $this->setStatus = $setStatus;
-        $this->getLinks = $getLinks;
+        $this->orderDetailsProvider = $orderDetailsProvider;
+        $this->sendCodeMailer = $sendCodeMailer;
+        $this->orderNotificationDispatcher = $orderNotificationDispatcher;
+        $this->linkRetriever = $linkRetriever;
     }
 
-    public function setOrderDetails($observer)
+    public function setOrderDetails($orderId)
     {
-
-        $this->orderDetails = $this->observerDispatcher->dispatchObserver($observer);
+        $this->orderDetails = $this->orderDetailsProvider->provide($orderId);
     }
-
-    private function setCompleteStatus($orderId, $totalNumberOfKeys)
-    {
-
-        $this->setStatus->setStatus($orderId, $totalNumberOfKeys);
-    }
-
-    private function sendMail($order, $attachments, $keys, $totalPreOrders)
-    {
-
-        $this->sendCodeMail->sendCodeMail($order, $attachments, $keys, $totalPreOrders);
-    }
-
 
     public function process()
     {
@@ -82,7 +86,7 @@ class SendCodesAction implements Action
 
         foreach ($orderDetails['orderedItems'] as $item_key => $item) {
 
-            $links = $this->getLinks->links($item, $item_key, $orderDetails);
+            $links = $this->linkRetriever->getLinks($item_key);
 
             $codes = array();
 
@@ -90,11 +94,12 @@ class SendCodesAction implements Action
 
                 foreach ($links as $link) {
 
-                    $code = \CodesWholesale\Resource\Code::get($link);
+                    $code = Code::get($link);
 
                     if ($code->isImage()) {
 
-                        $attachments[] = \CodesWholesale\Util\CodeImageWriter::write($code, 'Cw_Attachments');
+                        /** @var Code $code */
+                        $attachments[] = Base64Writer::writeImageCode($code, 'Cw_Attachments');
                     }
 
                     if ($code->isPreOrder()) {
@@ -113,9 +118,8 @@ class SendCodesAction implements Action
             }
         }
 
-        $this->sendMail($orderDetails['order'], $attachments, $keys, $totalPreOrders);
-
-        $this->setCompleteStatus($orderDetails['order'], $totalNumberOfKeys);
+        $this->sendCodeMailer->sendCodeMail($orderDetails['order'], $attachments, $keys, $totalPreOrders);
+        $this->orderNotificationDispatcher->complete($orderDetails['order'], $totalNumberOfKeys);
 
         $this->cleanAttach($attachments);
     }
