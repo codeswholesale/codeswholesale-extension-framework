@@ -11,5 +11,5 @@ interface UpdateProductInterface
 
     public function hideProduct($cwProductId);
 
-    public function newProduct($cwProductId);
+    public function newProduct($cwProductHref);
 }
