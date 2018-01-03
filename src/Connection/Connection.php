@@ -26,6 +26,7 @@ use CodesWholesale\Client;
 use CodesWholesale\Resource\AssignedPreOrder;
 use CodesWholesale\Resource\Notification;
 use CodesWholesale\Resource\StockAndPriceChange;
+use CodesWholesale\Resource\ProductNotification;
 use CodesWholesale\Storage\TokenDatabaseStorage;
 use CodesWholesale\Storage\TokenSessionStorage;
 use CodesWholesaleFramework\Postback\UpdateOrder\UpdateOrderInterface;
@@ -106,8 +107,8 @@ class Connection
             $productUpdater->hideProduct($notification->getProductId());
         });
 
-        self::$connection->registerNewProductHandler(function(Notification $notification) use($productUpdater) {
-            $productUpdater->newProduct($notification->getProductId());
+        self::$connection->registerNewProductHandler(function(ProductNotification $notification) use($productUpdater) {
+            $productUpdater->newProduct($notification->getProductHref());
         });
     }
 
