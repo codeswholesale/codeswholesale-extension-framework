@@ -20,15 +20,15 @@ namespace CodesWholesaleFramework\Orders\Codes;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 use CodesWholesale\Client;
+use CodesWholesaleFramework\Dispatcher\EventDispatcherInternalOrder;
 use CodesWholesaleFramework\Model\InternalOrder;
-use CodesWholesaleFramework\Postback\ReceivePreOrders\EventDispatcherInternalOrder;
+use CodesWholesaleFramework\Retriever\ItemRetriever;
 use CodesWholesaleFramework\Visitor\VisitorInterface;
 use CodesWholesaleFramework\Action;
 use CodesWholesaleFramework\Errors\ErrorHandler;
 use CodesWholesaleFramework\Orders\Utils\CodesProcessor;
 use CodesWholesaleFramework\Orders\Utils\DataBaseExporter;
 use CodesWholesaleFramework\Errors\Errors;
-use CodesWholesaleFramework\Postback\Retriever\ItemRetriever;
 use \CodesWholesale\Resource\ResourceError;
 
 /**
