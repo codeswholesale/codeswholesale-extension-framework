@@ -7,9 +7,9 @@ namespace CodesWholesaleFramework\Postback\UpdateProduct;
  */
 interface UpdateProductInterface
 {
-    public function updateProduct($cwProductId, $quantity , $priceSpread);
+    public function updateProduct($cwProductId, $quantity = null, $priceSpread = null);
 
     public function hideProduct($cwProductId);
 
-    public function newProduct($cwProductHref);
+    public function newProduct($cwProductId);
 }
