@@ -1,6 +1,6 @@
 <?php
 
-namespace CodesWholesaleFramework\Postback\ReceivePreOrders;
+namespace CodesWholesaleFramework\Dispatcher;
 
 use CodesWholesaleFramework\Model\InternalOrder;
 

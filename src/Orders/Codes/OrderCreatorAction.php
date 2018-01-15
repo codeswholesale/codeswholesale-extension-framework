@@ -20,15 +20,15 @@ namespace CodesWholesaleFramework\Orders\Codes;
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 use CodesWholesale\Client;
+use CodesWholesaleFramework\Dispatcher\EventDispatcherInternalOrder;
 use CodesWholesaleFramework\Model\InternalOrder;
-use CodesWholesaleFramework\Postback\ReceivePreOrders\EventDispatcherInternalOrder;
+use CodesWholesaleFramework\Retriever\ItemRetriever;
 use CodesWholesaleFramework\Visitor\VisitorInterface;
 use CodesWholesaleFramework\Action;
 use CodesWholesaleFramework\Errors\ErrorHandler;
 use CodesWholesaleFramework\Orders\Utils\CodesProcessor;
 use CodesWholesaleFramework\Orders\Utils\DataBaseExporter;
 use CodesWholesaleFramework\Errors\Errors;
-use CodesWholesaleFramework\Postback\Retriever\ItemRetriever;
 use \CodesWholesale\Resource\ResourceError;
 
 /**
@@ -149,38 +149,39 @@ class OrderCreatorAction implements Action
     {
         $error = null;
         $item = null;
-        $numberOfPreOrders = 0;
 
         $this->getInternalOrder()->accept($this->internalOrderVisitor);
 
+        $productsToBuy = [];
+        $productIds = [];
+
+        $i = 0;
+
         foreach ($this->getInternalOrder()->getItems() as $itemKey => $item) {
+            $productsToBuy[] = $this->itemRetriever->retrieveItem([
+                'item' => $item,
+                'order' => $this->getInternalOrder()->getOrder()
+            ]);
 
-            try {
-
-                $retrievedItems = $this->itemRetriever->retrieveItem([
-                    'item' => $item,
-                    'order' => $this->getInternalOrder()->getOrder()
-                ]);
-
-                $orderedCodes = $this->codesPurchaser->purchase($retrievedItems['cwProductId'], $retrievedItems['qty']);
-
-                if($orderedCodes['numberOfPreOrders'] > 0) {
-                    $numberOfPreOrders++;
-                }
-
-                $this->databaseExporter->export($item, $orderedCodes, $itemKey, $this->getInternalOrder()->getId());
-
-            } catch (ResourceError $e) {
-                $this->errorHandler->supportResourceError($this->getInternalOrder()->getOrder(), $e);
-                $error = $e;
-            } catch (\Exception $e) {
-                $this->errorHandler->supportError($this->getInternalOrder()->getOrder(), $e);
-                $error = $e;
-            }
+            $productIds[$productsToBuy[$i++]['productId']] = $itemKey;
         }
 
-        if($numberOfPreOrders > 0) {
-            $this->codesProcessor->process($this->getInternalOrder(), $numberOfPreOrders, $error, $item);
+        try {
+            $preOrdersCount = $this->codesPurchaser->purchase($productsToBuy, $productIds, $this->databaseExporter, $this->getInternalOrder()->getId());
+
+            if (0 < $preOrdersCount) {
+                $this->codesProcessor->process($this->getInternalOrder(), $preOrdersCount, null, $item);
+            }
+        } catch (ResourceError $e) {
+            $this->errorHandler->supportResourceError($this->getInternalOrder()->getOrder(), $e);
+            $error = $e;
+        } catch (\Exception $e) {
+            $this->errorHandler->supportError($this->getInternalOrder()->getOrder(), $e);
+            $error = $e;
+        }
+
+        if ($error) {
+            $this->codesProcessor->process($this->getInternalOrder(), 0, $error, $item);
         }
 
         $this->eventDispatcher->dispatch($this->getInternalOrder());

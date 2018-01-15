@@ -1,4 +1,7 @@
 <?php
+
+namespace CodesWholesaleFramework\Retriever;
+
 /**
  *   This file is part of codeswholesale-plugin-framework.
  *
@@ -16,24 +19,7 @@
  *   along with codeswholesale-plugin-framework; if not, write to the Free Software
  *   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-namespace CodesWholesaleFramework\Postback\ReceivePreOrders\Utils;
-/**
- * Created by PhpStorm.
- * User: maciejklowan
- * Date: 06/07/15
- * Time: 14:12
- */
-
-/**
- * Interface PreOrderReceiverInterface
- */
-interface PreOrderReceiverInterface
+interface ItemRetriever
 {
-    /**
-     * PreOrderReceiverInterface constructor.
-     *
-     * @param $itemRetriever
-     * @param $sendPreOrderDispatcher
-     */
-    public function __construct($itemRetriever, $sendPreOrderDispatcher);
+    public function retrieveItem($orderId);
 }
