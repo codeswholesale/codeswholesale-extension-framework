@@ -23,10 +23,6 @@ namespace CodesWholesaleFramework\Connection;
 use CodesWholesale\CodesWholesale;
 use CodesWholesale\ClientBuilder;
 use CodesWholesale\Client;
-use CodesWholesale\Resource\AssignedPreOrder;
-use CodesWholesale\Resource\Notification;
-use CodesWholesale\Resource\StockAndPriceChange;
-use CodesWholesale\Resource\ProductNotification;
 use CodesWholesale\Storage\TokenDatabaseStorage;
 use CodesWholesale\Storage\TokenSessionStorage;
 use CodesWholesaleFramework\Postback\UpdateOrder\UpdateOrderInterface;
@@ -39,8 +35,7 @@ class Connection
 {
     const SANDBOX_CLIENT_ID = 'ff72ce315d1259e822f47d87d02d261e';
     const SANDBOX_CLIENT_SECRET = '$2a$10$E2jVWDADFA5gh6zlRVcrlOOX01Q/HJoT6hXuDMJxek.YEo.lkO2T6';
-    const SANDBOX_SIGNATURE = 'test_signature';
-
+    
     /**
      * @var Client|null
      */
@@ -53,11 +48,7 @@ class Connection
      *
      * @return Client
      */
-    public static function getConnection(
-        array $options,
-        UpdateProductInterface $productUpdater = null,
-        UpdateOrderInterface $orderUpdater = null
-    ): Client
+    public static function getConnection(array $options): Client
     {
         if (self::$connection === null) {
             $builder = new ClientBuilder([
@@ -71,57 +62,11 @@ class Connection
             ]);
 
             self::$connection = $builder->build();
-
-            if ($productUpdater instanceof UpdateProductInterface) {
-                self::updateProduct($productUpdater);
-            }
-
-            if ($orderUpdater instanceof UpdateOrderInterface) {
-                self::updateOrder($orderUpdater);
-            }
-
-            self::$connection->handle(array_key_exists('signature', $options) && $options['signature'] != null ? $options['signature'] : self::SANDBOX_SIGNATURE);
-        }
+       }
+        
         return self::$connection;
     }
-
-    /**
-     * @param UpdateProductInterface $productUpdater
-     */
-    private static function updateProduct(UpdateProductInterface $productUpdater)
-    {
-        self::$connection->registerStockAndPriceChangeHandler(function(array $stockAndPriceChanges) use($productUpdater) {
-
-            /** @var StockAndPriceChange $stockAndPriceChange */
-            foreach ($stockAndPriceChanges as $stockAndPriceChange) {
-
-                $productUpdater->updateProduct(
-                    $stockAndPriceChange->getProductId(),
-                    $stockAndPriceChange->getQuantity(),
-                    $stockAndPriceChange->getPrice()
-                );
-            }
-        });
-
-        self::$connection->registerHidingProductHandler(function(Notification $notification) use($productUpdater) {
-            $productUpdater->hideProduct($notification->getProductId());
-        });
-
-        self::$connection->registerNewProductHandler(function(ProductNotification $notification) use($productUpdater) {
-            $productUpdater->newProduct($notification->getProductHref());
-        });
-    }
-
-    /**
-     * @param UpdateOrderInterface $orderUpdater
-     */
-    private static function updateOrder(UpdateOrderInterface $orderUpdater)
-    {
-        self::$connection->registerPreOrderAssignedHandler(function(AssignedPreOrder $notification) use($orderUpdater) {
-            $orderUpdater->preOrderAssigned($notification->getCodeId());
-        });
-    }
-
+    
     /**
      * @return bool
      */
