@@ -10,7 +10,7 @@
         "games",
         "cd-keys"],
     "homepage": "https://github.com/codeswholesale/codeswholesale-extension-framework",
-    "license": "GPL 2.0",
+    "license": "GPL-2.0-or-later",
     "authors": [
         {
             "name": "CodesWholesale.com",
@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": ">=7.0.0",
-        "codeswholesale/sdk": "dev-codeswholesale-sdk-php-version-2"
+        "codeswholesale/sdk": "2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"
