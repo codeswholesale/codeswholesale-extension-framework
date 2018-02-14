@@ -35,6 +35,7 @@ class Connection
 {
     const SANDBOX_CLIENT_ID = 'ff72ce315d1259e822f47d87d02d261e';
     const SANDBOX_CLIENT_SECRET = '$2a$10$E2jVWDADFA5gh6zlRVcrlOOX01Q/HJoT6hXuDMJxek.YEo.lkO2T6';
+    const SANDBOX_SIGNATURE = 'b4cded07-e13e-4021-8b9f-a3cee994109b';
     
     /**
      * @var Client|null
@@ -58,7 +59,8 @@ class Connection
                 'cw.token_storage' => isset($options['db']) && $options['db'] instanceof \PDO ? new TokenDatabaseStorage($options['db'], $options['prefix']) : new TokenSessionStorage(),
                 'cw.client.headers' => [
                     'User-Agent' => $options['client_headers'],
-                ]
+                ],
+                'cw.signature' => isset($options['signature']) ? $options['signature'] : self::SANDBOX_SIGNATURE
             ]);
 
             self::$connection = $builder->build();
