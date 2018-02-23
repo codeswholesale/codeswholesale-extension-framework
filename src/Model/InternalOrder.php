@@ -53,7 +53,7 @@ class InternalOrder implements VisitorAwareInterface
      */
     public function getItems(): array
     {
-        return $this->items;
+        return $this->items ? $this->items : [];
     }
 
     /**

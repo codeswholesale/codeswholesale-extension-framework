@@ -172,6 +172,9 @@ class OrderCreatorAction implements Action
             if (0 < $preOrdersCount) {
                 $this->codesProcessor->process($this->getInternalOrder(), $preOrdersCount, null, $item);
             }
+			
+			$this->eventDispatcher->dispatch($this->getInternalOrder());
+			
         } catch (ResourceError $e) {
             $this->errorHandler->supportResourceError($this->getInternalOrder()->getOrder(), $e);
             $error = $e;
@@ -183,8 +186,6 @@ class OrderCreatorAction implements Action
         if ($error) {
             $this->codesProcessor->process($this->getInternalOrder(), 0, $error, $item);
         }
-
-        $this->eventDispatcher->dispatch($this->getInternalOrder());
 
         return $error != null;
     }
