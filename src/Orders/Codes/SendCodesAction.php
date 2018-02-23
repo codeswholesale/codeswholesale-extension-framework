@@ -56,18 +56,25 @@ class SendCodesAction implements Action
      */
     private $orderDetails;
 
+    /**
+     * @var string
+     */
+    private $imageCodesPath;
+
 
     public function __construct(
         OrderDetailsProvider $orderDetailsProvider,
         SendCodeMailer $sendCodeMailer,
         OrderNotificationDispatcher $orderNotificationDispatcher,
-        LinkRetriever $linkRetriever
+        LinkRetriever $linkRetriever,
+        string $imageCodesPath = 'Cw_Attachments'
     )
     {
         $this->orderDetailsProvider = $orderDetailsProvider;
-        $this->sendCodeMailer = $sendCodeMailer;
+        $this->sendCodeMailer   = $sendCodeMailer;
         $this->orderNotificationDispatcher = $orderNotificationDispatcher;
-        $this->linkRetriever = $linkRetriever;
+        $this->linkRetriever    = $linkRetriever;
+        $this->imageCodesPath   = $imageCodesPath;
     }
 
     public function setOrderDetails($orderId)
@@ -99,7 +106,7 @@ class SendCodesAction implements Action
                     if ($code->isImage()) {
 
                         /** @var Code $code */
-                        $attachments[] = Base64Writer::writeImageCode($code, 'Cw_Attachments');
+                        $attachments[] = Base64Writer::writeImageCode($code, $this->imageCodesPath);
                     }
 
                     if ($code->isPreOrder()) {
@@ -119,7 +126,7 @@ class SendCodesAction implements Action
         }
 
         $this->sendCodeMailer->sendCodeMail($orderDetails['order'], $attachments, $keys, $totalPreOrders);
-        $this->orderNotificationDispatcher->complete($orderDetails['order'], $totalNumberOfKeys);
+        $this->orderNotificationDispatcher->complete($orderDetails['order'], $totalNumberOfKeys, $totalPreOrders);
 
         $this->cleanAttach($attachments);
     }
