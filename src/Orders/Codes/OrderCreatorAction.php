@@ -167,13 +167,15 @@ class OrderCreatorAction implements Action
         }
 
         try {
-            $preOrdersCount = $this->codesPurchaser->purchase($productsToBuy, $productIds, $this->databaseExporter, $this->getInternalOrder()->getId());
+	    if (count($productsToBuy) > 0) {
+            	$preOrdersCount = $this->codesPurchaser->purchase($productsToBuy, $productIds, $this->databaseExporter, $this->getInternalOrder()->getId());
 
-            if (0 < $preOrdersCount) {
-                $this->codesProcessor->process($this->getInternalOrder(), $preOrdersCount, null, $item);
-            }
+	    	if (0 < $preOrdersCount) {
+		    $this->codesProcessor->process($this->getInternalOrder(), $preOrdersCount, null, $item);
+	    	}
 			
-			$this->eventDispatcher->dispatch($this->getInternalOrder());
+	    	$this->eventDispatcher->dispatch($this->getInternalOrder());
+	    }
 			
         } catch (ResourceError $e) {
             $this->errorHandler->supportResourceError($this->getInternalOrder()->getOrder(), $e);
