@@ -158,24 +158,28 @@ class OrderCreatorAction implements Action
         $i = 0;
 
         foreach ($this->getInternalOrder()->getItems() as $itemKey => $item) {
-            $productsToBuy[] = $this->itemRetriever->retrieveItem([
+            $product = $this->itemRetriever->retrieveItem([
                 'item' => $item,
                 'order' => $this->getInternalOrder()->getOrder()
             ]);
+	
+			if($product['productId']) {
+				$productsToBuy[] = $product;
+			}
 
             $productIds[$productsToBuy[$i++]['productId']] = $itemKey;
         }
 
         try {
-	    if (count($productsToBuy) > 0) {
-            	$preOrdersCount = $this->codesPurchaser->purchase($productsToBuy, $productIds, $this->databaseExporter, $this->getInternalOrder()->getId());
+			if (count($productsToBuy) > 0) {
+					$preOrdersCount = $this->codesPurchaser->purchase($productsToBuy, $productIds, $this->databaseExporter, $this->getInternalOrder()->getId());
 
-	    	if (0 < $preOrdersCount) {
-		    $this->codesProcessor->process($this->getInternalOrder(), $preOrdersCount, null, $item);
-	    	}
-			
-	    	$this->eventDispatcher->dispatch($this->getInternalOrder());
-	    }
+				if (0 < $preOrdersCount) {
+				$this->codesProcessor->process($this->getInternalOrder(), $preOrdersCount, null, $item);
+				}
+				
+				$this->eventDispatcher->dispatch($this->getInternalOrder());
+			}
 			
         } catch (ResourceError $e) {
             $this->errorHandler->supportResourceError($this->getInternalOrder()->getOrder(), $e);
