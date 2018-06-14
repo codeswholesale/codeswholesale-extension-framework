@@ -20,13 +20,13 @@ class CurrencyProvider
     }
     
     public static function getRate($id) {
-        $conver = "EUR_" . $id;
+        $convert = "EUR_" . $id;
          
-        $content = file_get_contents(self::API . "/convert?q=" . $conver);
+        $content = file_get_contents(self::API . "/convert?q=" . $convert);
          
         $result  = json_decode($content);
 
-        return $result->results->$conver->val;       
+        return $result->results->$convert->val;       
     }
     
     /**
