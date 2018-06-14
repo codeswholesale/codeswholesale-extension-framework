@@ -6,11 +6,33 @@ namespace CodesWholesaleFramework\Provider;
  * Class CurrencyProvider
  */
 class CurrencyProvider
-{
+{ 
+    const API = 'https://free.currencyconverterapi.com/api/v5';
+    
+    public static function getAllCurrencies() 
+    {    
+        $content = file_get_contents(self::API . "/currencies");
+
+        $result  = json_decode($content);
+        
+        return $result->results;
+               
+    }
+    
+    public static function getRate($id) {
+        $conver = "EUR_" . $id;
+         
+        $content = file_get_contents(self::API . "/convert?q=" . $conver);
+         
+        $result  = json_decode($content);
+
+        return $result->results->$conver->val;       
+    }
+    
     /**
      * @return mixed
      */
-    public static function import()
+    public static function importXml()
     {
         $xml = self::getXML();
 
@@ -22,7 +44,7 @@ class CurrencyProvider
      *
      * @return array|null
      */
-    public static function getRateByCurrencyName($currency)
+    public static function getXmlRateByCurrencyName($currency)
     {
         if ('EUR' === $currency) {
 

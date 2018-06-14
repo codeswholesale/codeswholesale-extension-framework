@@ -73,7 +73,7 @@ class PriceProvider
      * @return float
      */
     private function getCalculatedPriceByCurrencyRate($stock_price, $currency) {
-        $rate = CurrencyProvider::getRateByCurrencyName($currency);
+        $rate = CurrencyProvider::getRate($currency);
 
         return  floatval($stock_price) * floatval($rate[0]);
     }
