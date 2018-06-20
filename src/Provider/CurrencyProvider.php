@@ -8,6 +8,9 @@ namespace CodesWholesaleFramework\Provider;
 class CurrencyProvider
 { 
     const API = 'https://free.currencyconverterapi.com/api/v5';
+       
+    private static $lastUsedCurrency = '';
+    private static $lastUsedRate = '';
     
     public static function getAllCurrencies() 
     {    
@@ -15,18 +18,23 @@ class CurrencyProvider
 
         $result  = json_decode($content);
         
-        return $result->results;
-               
+        return $result->results;         
     }
     
-    public static function getRate($id) {
-        $convert = "EUR_" . $id;
-         
-        $content = file_get_contents(self::API . "/convert?q=" . $convert);
-         
-        $result  = json_decode($content);
+    public static function getRate($id) 
+    {
+        if(self::$lastUsedCurrency !== $id) {
+            $convert = "EUR_" . $id;
 
-        return $result->results->$convert->val;       
+            $content = file_get_contents(self::API . "/convert?q=" . $convert);
+
+            $result  = json_decode($content);  
+            
+            self::$lastUsedCurrency = $id;
+            self::$lastUsedRate = $result->results->$convert->val;  
+        } 
+       
+        return self::$lastUsedRate;      
     }
     
     /**
