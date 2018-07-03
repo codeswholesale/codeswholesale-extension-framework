@@ -121,11 +121,6 @@ class CsvImportGenerator
             $externalProduct->getProduct()->getStockQuantity()
         );
 
-        $description = $this->getDiffLineByKey(
-            ProductDiffGenerator::FIELD_DESCRIPTION,
-            $externalProduct->getDescription()
-        );
-
         $cover = $this->getDiffLineByKey(
             ProductDiffGenerator::FIELD_COVER,
             $externalProduct->getProduct()->getImageUrl('MEDIUM')
@@ -140,7 +135,6 @@ class CsvImportGenerator
             (string) '"' . $platform . '"',
             (string) '"' . $regions . '"',
             (string) '"' . $languages . '"',
-           // (string) '"' . $description . '"',
             (string) '"' . $cover . '"',
         ];
     }

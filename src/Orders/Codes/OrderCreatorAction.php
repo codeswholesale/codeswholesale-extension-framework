@@ -165,9 +165,8 @@ class OrderCreatorAction implements Action
 	
 			if($product['productId']) {
 				$productsToBuy[] = $product;
+                $productIds[$productsToBuy[$i++]['productId']] = $itemKey;
 			}
-
-            $productIds[$productsToBuy[$i++]['productId']] = $itemKey;
         }
 
         try {
