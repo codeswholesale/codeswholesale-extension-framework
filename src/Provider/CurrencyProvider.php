@@ -9,7 +9,7 @@ class CurrencyProvider
 { 
     const API = 'https://free.currencyconverterapi.com/api/v5';
     const MAX_REQUEST = 3;
-    const REQUEST_SLEEP_TIME = 10;
+    const REQUEST_SLEEP_TIME = 5;
 
     private static $lastUsedCurrency = '';
     private static $lastUsedRate = '';
