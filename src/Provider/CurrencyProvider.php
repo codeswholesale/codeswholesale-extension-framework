@@ -17,15 +17,20 @@ class CurrencyProvider
     private static $requestNumber = 1;
 
     /**
-     * @return mixed
-     * @throws \Exception
+     * @param string $default
+     * @return array
      */
-    public static function getAllCurrencies()
+    public static function getAllCurrencies($default = 'EUR')
     {
         $content = @file_get_contents(self::API . "/currencies");
 
         if (!$content) {
-            throw new \Exception("Currency provider is not responding.");
+            $currency = [
+                'currencyName' => $default,
+                'id'  => $default
+            ];
+
+            return  [ (object) $currency ];
         }
 
         $result  = json_decode($content);
@@ -49,6 +54,7 @@ class CurrencyProvider
     /**
      * @param $id
      * @return string
+     * @throws \Exception
      */
     public static function getRate($id)
     {
