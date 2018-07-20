@@ -66,6 +66,19 @@ class CurrencyProvider
     }
 
     /**
+     *
+     * @param type $result
+     * @param type $convert
+     * @return boolean
+     */
+    public static function issetRate($result, $convert) {
+        return
+            isset($result->results) &&
+            isset($result->results->$convert->val) &&
+            $result->results->$convert->val > 0;
+    }
+
+    /**
      * @param $id
      * @throws \Exception
      */
@@ -77,7 +90,7 @@ class CurrencyProvider
         $result  = json_decode($content);
 
         if($id && self::$requestNumber <= 3) {
-            if($result->results && $result->results->$convert->val && $result->results->$convert->val > 0) {
+            if(self::issetRate($result, $convert)) {
                 self::$lastUsedCurrency = $id;
                 self::$lastUsedRate = $result->results->$convert->val;
             } else {
