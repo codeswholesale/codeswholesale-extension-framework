@@ -2,142 +2,192 @@
 
 namespace CodesWholesaleFramework\Provider;
 
+use CodesWholesaleFramework\Api\Currency;
+use CodesWholesaleFramework\Database\Factories\CurrencyControlModelFactory;
+use CodesWholesaleFramework\Database\Interfaces\DbManagerInterface;
+use CodesWholesaleFramework\Database\Models\CurrencyControlModel;
+use CodesWholesaleFramework\Database\Repositories\CurrencyControlRepository;
+
 /**
  * Class CurrencyProvider
  */
 class CurrencyProvider
-{ 
-    const API = 'https://free.currencyconverterapi.com/api/v5';
-    const MAX_REQUEST = 3;
-    const REQUEST_SLEEP_TIME = 5;
+{
+    /**
+     * @var CurrencyControlRepository
+     */
+    protected $repository;
 
-    private static $lastUsedCurrency = '';
-    private static $lastUsedRate = '';
-
-    private static $requestNumber = 1;
+    /**
+     * CurrencyProvider constructor.
+     * @param DbManagerInterface $db
+     */
+    public function __construct(DbManagerInterface $db)
+    {
+        $this->repository = new CurrencyControlRepository($db);
+    }
 
     /**
      * @param string $default
+     * @return array|CurrencyControlModel[]
+     */
+    public function getAllCurrencies($default = 'EUR')
+    {
+        /* @var $currencies CurrencyControlModel[] */
+        $currencies = $this->repository->findAll();
+
+        try {
+            return $this->preProcessCurrencies($currencies);
+        } catch(\Exception $ex) {
+            /* @var $currency CurrencyControlModel */
+            $currency = (new CurrencyControlModel())->setCurrency($default)->setCurrencyName($default);
+
+            return  [$currency];
+        }
+    }
+
+    /**
+     * @param $currencyId
+     * @return float
+     * @throws \Exception
+     */
+    public function getRate($currencyId)
+    {
+        try {
+            /* @var $currency CurrencyControlModel */
+            $currency = $this->repository->find($currencyId);
+
+            return (float) $this->preProcessCurrencyRate($currency);
+        } catch(\Exception $ex) {
+            throw $ex;
+        }
+    }
+
+
+    /**
+     * @param CurrencyControlModel $currency
+     * @return null|string
+     * @throws \Exception
+     */
+    private function preProcessCurrencyRate(CurrencyControlModel $currency)
+    {
+        if(! $currency->getRate() || $currency->getRate() == null || $this->isOldDate($currency->getRateUpdatedAt())) {
+            try {
+                return $this->setCurrencyRate($currency);
+            } catch(\Exception $ex) {
+                throw $ex;
+            }
+        }
+
+        return $currency->getRate();
+    }
+
+    /**
+     * @param CurrencyControlModel $currency
+     * @return null|string
+     * @throws \Exception
+     */
+    private function setCurrencyRate(CurrencyControlModel $currency)
+    {
+        try {
+            $rate = Currency::getRate($currency->getCurrency());
+            $this->repository->setRate($currency->getCurrency(), $rate);
+
+            return $rate;
+        } catch(\Exception $ex) {
+            if ($currency->getRate() && $currency->getRate() != null) {
+                return $currency->getRate();
+            }
+
+            throw $ex;
+        }
+    }
+
+    /**
+     * @param CurrencyControlModel[]
+     * @return CurrencyControlModel[]
+     * @throws \Exception
+     */
+    private function preProcessCurrencies($currencies)
+    {
+        if(count($currencies) == 0) {
+            try {
+                return $this->setNewCurrencies();
+            } catch(\Exception $ex) {
+                throw $ex;
+            }
+        }
+
+        /* @var $currency CurrencyControlModel */
+        $currency = $currencies[0];
+
+        if($this->isOldDate($currency->getUpdatedAt())) {
+            return $this->setUpdatedCurrencies($currencies);
+        }
+
+        return $currencies;
+    }
+
+    /**
+     * @return CurrencyControlModel[]
+     * @throws \Exception
+     */
+    private function setNewCurrencies()
+    {
+        try {
+            $currencies = Currency::getAllCurrencies();
+        } catch(\Exception $ex) {
+            throw $ex;
+        }
+
+        $models = [];
+
+        foreach($currencies as $c) {
+            $model = CurrencyControlModelFactory::createInstanceToSave($c);
+            $models[] = $model;
+
+            $this->repository->save($model);
+        }
+
+        return $models;
+    }
+
+    /**
+     * @param $default
      * @return array
      */
-    public static function getAllCurrencies($default = 'EUR')
+    private function setUpdatedCurrencies($default)
     {
-        $content = @file_get_contents(self::API . "/currencies");
-
-        if (!$content) {
-            $currency = [
-                'currencyName' => $default,
-                'id'  => $default
-            ];
-
-            return  [ (object) $currency ];
+        try {
+            $currencies = Currency::getAllCurrencies();
+        } catch(\Exception $ex) {
+            return $default;
         }
 
-        $result  = json_decode($content);
+        $models = [];
 
-        return $result->results;
-    }
+        foreach($currencies as $c) {
+            try {
+                $model = $this->repository->find($c->id);
+                $this->repository->overwrite($model);
+            } catch(\Exception $ex) {
+                $model = CurrencyControlModelFactory::createInstanceToSave($c);
 
-    /**
-     * @param $id
-     * @throws \Exception
-     */
-    public static function setRate($id) {
-        if('EUR' === $id) {
-            self::$lastUsedCurrency = $id;
-            self::$lastUsedRate = 1;
-        } else {
-            self::convert($id);
-        }
-    }
-
-    /**
-     * @param $id
-     * @return string
-     * @throws \Exception
-     */
-    public static function getRate($id)
-    {
-        if(!$id || self::$lastUsedCurrency !== $id) {
-            self::setRate($id);
-        }
-
-        return self::$lastUsedRate;
-    }
-
-    /**
-     *
-     * @param type $result
-     * @param type $convert
-     * @return boolean
-     */
-    public static function issetRate($result, $convert) {
-        return
-            isset($result->results) &&
-            isset($result->results->$convert->val) &&
-            $result->results->$convert->val > 0;
-    }
-
-    /**
-     * @param $id
-     * @throws \Exception
-     */
-    private static function convert($id) {
-        $convert = "EUR_" . $id;
-
-        $content = @file_get_contents(self::API . "/convert?q=" . $convert);
-
-        $result  = json_decode($content);
-
-        if($id && self::$requestNumber <= 3) {
-            if(self::issetRate($result, $convert)) {
-                self::$lastUsedCurrency = $id;
-                self::$lastUsedRate = $result->results->$convert->val;
-            } else {
-                self::$requestNumber++;
-                sleep(self::REQUEST_SLEEP_TIME);
-                self::convert($id);
+                $this->repository->save($model);
             }
-        } else {
-            throw new \Exception("Currency provider is not responding.");
+            $models[] = $model;
         }
-    }
-    
-    /**
-     * @return mixed
-     */
-    public static function importXml()
-    {
-        $xml = self::getXML();
 
-        return $xml->Cube->Cube->children();
+        return $models;
     }
 
     /**
-     * @param $currency
-     *
-     * @return array|null
+     * @param $used
+     * @return bool
      */
-    public static function getXmlRateByCurrencyName($currency)
-    {
-        if ('EUR' === $currency) {
+    private function isOldDate($used) {
+        $yesterday = new \DateTime("yesterday");
 
-            return [1];
-
-        } else {
-
-            $rates = self::import();
-
-            foreach ($rates as $rate) {
-                if ($currency == $rate->attributes()->currency) {
-                    return (array) floatval($rate->attributes()->rate);
-                }
-            }
-        }
-    }
-
-    public static function getXML()
-    {
-        return simplexml_load_file('http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml');
+        return $used <= $yesterday;
     }
 }

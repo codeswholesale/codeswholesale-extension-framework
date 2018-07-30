@@ -2,11 +2,34 @@
 
 namespace CodesWholesaleFramework\Provider;
 
+use CodesWholesaleFramework\Database\Interfaces\DbManagerInterface;
+
 /**
  * Class PriceProvider
  */
 class PriceProvider
 {
+
+    /**
+     * @var DbManagerInterface
+     */
+    protected $db;
+
+    /**
+     * @var CurrencyProvider
+     */
+    protected $currencyProvider;
+
+    /**
+     * PriceProvider constructor.
+     * @param DbManagerInterface $db
+     */
+    public function __construct(DbManagerInterface $db)
+    {
+        $this->db = $db;
+        $this->currencyProvider = new CurrencyProvider($db);
+    }
+
     /**
      * @param $spread_type
      * @param $spread_value
@@ -69,11 +92,14 @@ class PriceProvider
     /**
      * @param $stock_price
      * @param $currency
-     *
-     * @return float
+     * @return float|int
      */
     private function getCalculatedPriceByCurrencyRate($stock_price, $currency) {
-        $rate = CurrencyProvider::getRate($currency);
+        try {
+            $rate =  $this->currencyProvider->getRate($currency);
+        } catch(\Exception $ex) {
+            $rate = 1;
+        }
 
         return  floatval($stock_price) * floatval($rate);
     }
