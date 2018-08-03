@@ -177,7 +177,7 @@ class ExternalProduct
                 $thumb = [ 'url' => $url,'name' => $this->getFileName($url)];
             }
 
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $thumb = [];
         }
 
@@ -205,7 +205,7 @@ class ExternalProduct
             }
 
             $urls = empty($preferred) ? $default : $preferred;
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             $urls = [];
         }
 
