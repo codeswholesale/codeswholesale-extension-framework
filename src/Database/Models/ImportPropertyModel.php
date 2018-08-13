@@ -226,7 +226,7 @@ class ImportPropertyModel
     /**
      * @return int
      */
-    public function getUserId(): ?int
+    public function getUserId()
     {
         return $this->userId;
     }
