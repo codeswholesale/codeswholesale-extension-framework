@@ -50,7 +50,7 @@ class CodeswholesaleProductModelFactory
     public function create(ExternalProduct $externalProduct, $lang)
     {
         if($this->repository->isset($externalProduct->getProduct()->getProductId(), $lang)) {
-            $this->update($externalProduct, $this->prepare($externalProduct->getProduct()->getProductId(), $lang));
+            $this->update($externalProduct, $this->prepare($externalProduct, $lang));
 
             return;
         }
