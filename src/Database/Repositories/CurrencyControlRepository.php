@@ -81,7 +81,7 @@ class CurrencyControlRepository extends Repository
         ]);
 
         if(count($results) === 0 ) {
-            throw new \Exception('Not found');
+            throw new \Exception('Currency not found in database');
         }
 
         return CurrencyControlModelFactory::resolve((object) $results[0]);

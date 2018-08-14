@@ -79,11 +79,14 @@ class CodeswholesaleProductModelFactory
         $this->repository->save($cwModel);
     }
 
-    public function prepare($product_id, $lang)
+    public function prepare(ExternalProduct $externalProduct, $lang)
     {
-        $model = $this->repository->find($product_id, $lang);
-
-        return $model;
+        try {
+            return $this->repository->find($externalProduct->getProduct()->getProductId(), $lang);
+        } catch (\Exception $ex) {
+            $this->create($externalProduct, $lang);
+            return $this->prepare($externalProduct, $lang);
+        }
     }
 
     public function update(ExternalProduct $externalProduct, CodeswholesaleProductModel $cwModel)

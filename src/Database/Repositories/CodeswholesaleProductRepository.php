@@ -86,7 +86,7 @@ class CodeswholesaleProductRepository extends Repository {
         ]);
 
         if(count($results) === 0 ) {
-            throw new \Exception('Not found');
+            throw new \Exception('Codeswholesale product not found in database');
         }
 
         return CodeswholesaleProductModelFactory::resolve((object) $results[0]);
