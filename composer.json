@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": ">=7.0.0",
-        "codeswholesale/sdk": "2.1.8"
+        "codeswholesale/sdk": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"
