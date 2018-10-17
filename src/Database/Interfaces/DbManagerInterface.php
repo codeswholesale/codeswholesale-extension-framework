@@ -8,6 +8,8 @@ interface DbManagerInterface
 {
     public function getPrefix();
 
+    public function sql(string $sql): bool;
+    
     public function exists(string $table): bool;
 
     public function insert(string $table, array $fields): bool;

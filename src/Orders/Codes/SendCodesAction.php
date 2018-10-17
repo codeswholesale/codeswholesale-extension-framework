@@ -128,7 +128,7 @@ class SendCodesAction implements Action
         $this->sendCodeMailer->sendCodeMail($orderDetails['order'], $attachments, $keys, $totalPreOrders);
         $this->orderNotificationDispatcher->complete($orderDetails['order'], $totalNumberOfKeys, $totalPreOrders);
 
-        $this->cleanAttach($attachments);
+      //  $this->cleanAttach($attachments);
     }
 
     /**

@@ -6,6 +6,7 @@ use CodesWholesale\Client;
 use CodesWholesale\Resource\AssignedPreOrder;
 use CodesWholesale\Resource\Notification;
 use CodesWholesale\Resource\StockAndPriceChange;
+use CodesWholesale\Resource\FullProduct;
 use CodesWholesaleFramework\Postback\UpdateOrder\UpdateOrderInterface;
 use CodesWholesaleFramework\Postback\UpdateProduct\UpdateProductInterface;
 
@@ -70,6 +71,10 @@ class RegisterHandlers
 
         $this->client->registerNewProductHandler(function (Notification $notification) {
             $this->productUpdater->newProduct($notification->getProductId());
+        });
+        
+        $this->client->registerFullProductHandler(function (array $fullProducts) {
+            $this->productUpdater->fullProducts($fullProducts);
         });
     }
 

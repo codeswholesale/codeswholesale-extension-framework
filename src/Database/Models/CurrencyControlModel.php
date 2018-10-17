@@ -55,7 +55,7 @@ class CurrencyControlModel
     /**
      * @return \DateTime
      */
-    public function getUpdatedAt(): ?\DateTime
+    public function getUpdatedAt()
     {
         return $this->updatedAt;
     }
@@ -112,7 +112,7 @@ class CurrencyControlModel
     /**
      * @return string
      */
-    public function getRate(): ?string
+    public function getRate()
     {
         return $this->rate;
     }
@@ -131,7 +131,7 @@ class CurrencyControlModel
     /**
      * @return \DateTime | null
      */
-    public function getRateUpdatedAt(): ?\DateTime
+    public function getRateUpdatedAt()
     {
         return $this->rateUpdatedAt;
     }

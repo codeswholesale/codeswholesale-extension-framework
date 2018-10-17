@@ -1,7 +1,7 @@
 <?php
 namespace CodesWholesaleFramework\Database\Factories;
 
-use CodesWholesaleFramework\Model\ExternalProduct;
+use CodesWholesaleFramework\Model\ProductModel;
 use CodesWholesaleFramework\Database\Interfaces\DbManagerInterface;
 use CodesWholesaleFramework\Database\Models\CodeswholesaleProductModel;
 use CodesWholesaleFramework\Database\Repositories\CodeswholesaleProductRepository;
@@ -20,6 +20,11 @@ class CodeswholesaleProductModelFactory
         $this->repository = new CodeswholesaleProductRepository($db);
     }
 
+    /**
+     * 
+     * @param \stdClass $parameters
+     * @return CodeswholesaleProductModel
+     */
     public static function resolve(\stdClass $parameters): CodeswholesaleProductModel
     {
         $model = new CodeswholesaleProductModel();
@@ -47,22 +52,28 @@ class CodeswholesaleProductModelFactory
         return $model;
     }
 
-    public function create(ExternalProduct $externalProduct, $lang)
+    /**
+     * 
+     * @param ProductModel $productModel
+     * @param type $lang
+     * @return type
+     */
+    public function create(ProductModel $productModel, $lang)
     {
-        if($this->repository->isset($externalProduct->getProduct()->getProductId(), $lang)) {
-            $this->update($externalProduct, $this->prepare($externalProduct, $lang));
+        if($this->repository->isset($productModel->getProductId(), $lang)) {
+            $this->update($productModel, $this->prepare($productModel, $lang));
 
             return;
         }
 
         $cwModel =  new CodeswholesaleProductModel();
 
-        $cwModel->setProductId($externalProduct->getProduct()->getProductId());
-        $cwModel->setDescription($externalProduct->getDescription());
-        $cwModel->setTitle($externalProduct->getProduct()->getName());
+        $cwModel->setProductId($productModel->getProductId());
+        $cwModel->setDescription($productModel->getFactSheets());
+        $cwModel->setTitle($productModel->getName());
         $cwModel->setPreferredLanguage($lang);
 
-        $thumb = $externalProduct->getThumbnail();
+        $thumb = $productModel->getImage();
 
         if($thumb && $thumb['name']) {
             $cwModel->setImage($thumb['name']) ;
@@ -70,7 +81,7 @@ class CodeswholesaleProductModelFactory
 
         $photos = [];
 
-        foreach($externalProduct->getPhotos() as $photo) {
+        foreach($productModel->getPhotos() as $photo) {
             $photos[] = $photo['name'];
         }
 
@@ -79,21 +90,32 @@ class CodeswholesaleProductModelFactory
         $this->repository->save($cwModel);
     }
 
-    public function prepare(ExternalProduct $externalProduct, $lang)
+    /**
+     * 
+     * @param ProductModel $productModel
+     * @param type $lang
+     * @return type
+     */
+    public function prepare(ProductModel $productModel, $lang)
     {
         try {
-            return $this->repository->find($externalProduct->getProduct()->getProductId(), $lang);
+            return $this->repository->find($productModel->getProductId(), $lang);
         } catch (\Exception $ex) {
-            $this->create($externalProduct, $lang);
-            return $this->prepare($externalProduct, $lang);
+            $this->create($productModel, $lang);
+            return $this->prepare($productModel, $lang);
         }
     }
 
-    public function update(ExternalProduct $externalProduct, CodeswholesaleProductModel $cwModel)
+    /**
+     * 
+     * @param ProductModel $productModel
+     * @param CodeswholesaleProductModel $cwModel
+     */
+    public function update(ProductModel $productModel, CodeswholesaleProductModel $cwModel)
     {
-        $cwModel->setDescription($externalProduct->getDescription());
-        $cwModel->setTitle($externalProduct->getProduct()->getName());
-        $thumb = $externalProduct->getThumbnail();
+        $cwModel->setDescription($productModel->getFactSheets());
+        $cwModel->setTitle($productModel->getName());
+        $thumb = $productModel->getImage();
 
         if($thumb && $thumb['name']) {
             $cwModel->setImage($thumb['name']) ;
@@ -101,7 +123,7 @@ class CodeswholesaleProductModelFactory
 
         $photos = [];
 
-        foreach($externalProduct->getPhotos() as $photo) {
+        foreach($productModel->getPhotos() as $photo) {
             $photos[] = $photo['name'];
         }
 
