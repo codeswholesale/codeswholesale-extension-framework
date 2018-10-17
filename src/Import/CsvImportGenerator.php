@@ -1,7 +1,8 @@
 <?php
 namespace CodesWholesaleFramework\Import;
 
-use CodesWholesaleFramework\Model\ExternalProduct;
+use CodesWholesaleFramework\Model\ProductModel;
+
 /**
  * Class CsvGenerator
  */
@@ -32,12 +33,12 @@ class CsvImportGenerator
     }
     
     
-    public function appendNewProduct(ExternalProduct $externalProduct) {
-        $this->csvGenerator->append($this->generateInsertLine($externalProduct));
+    public function appendNewProduct(ProductModel $productModel) {
+        $this->csvGenerator->append($this->generateInsertLine($productModel));
     }
     
-    public function appendUpdatedProduct(ExternalProduct $externalProduct, array $diff) {
-        $this->csvGenerator->append($this->generateUpdateLine($externalProduct, $diff));
+    public function appendUpdatedProduct(ProductModel $productModel, array $diff) {
+        $this->csvGenerator->append($this->generateUpdateLine($productModel, $diff));
     }
     
     /**
@@ -53,37 +54,36 @@ class CsvImportGenerator
             'Stock',
             'Platform',
             'Regions',
-            'Languages',
-            'Cover',
+            'Languages'
         ];
     }
     
     /**
-     * @param ExternalProduct $externalProduct
-     *
+     * 
+     * @param ProductModel $productModel
      * @return array
      */
-    private function generateInsertLine(ExternalProduct $externalProduct): array
+    private function generateInsertLine(ProductModel $productModel): array
     {
         return [
-            (string) '"' . $externalProduct->getProduct()->getProductId() .'"',
+            (string) '"' . $productModel->getProductId() .'"',
             (string) '"' . 'Imported' .'"',
-            (string) '"' . $externalProduct->getProduct()->getName() .'"',
-            (string) '"' . $externalProduct->getProduct()->getLowestPrice() .'"',
-            (string) '"' . $externalProduct->getProduct()->getStockQuantity() .'"',
-            (string) '"' . ProductDiffGenerator::implodeArray($externalProduct->getProduct()->getPlatform()) .'"',
-            (string) '"' . ProductDiffGenerator::implodeArray($externalProduct->getProduct()->getRegions()) .'"',
-            (string) '"' . ProductDiffGenerator::implodeArray($externalProduct->getProduct()->getLanguages()) .'"',
-            (string) '"' . $externalProduct->getProduct()->getImageUrl('MEDIUM') .'"',
+            (string) '"' . $productModel->getName() .'"',
+            (string) '"' . $productModel->getPrice() .'"',
+            (string) '"' . $productModel->getQuantity() .'"',
+            (string) '"' . ProductDiffGenerator::implodeArray($productModel->getPlatform()) .'"',
+            (string) '"' . ProductDiffGenerator::implodeArray($productModel->getRegions()) .'"',
+            (string) '"' . ProductDiffGenerator::implodeArray($productModel->getLanguages()) .'"',
         ];
     }
     
-        /**
-     * @param ExternalProduct $externalProduct
-     *
+    /**
+     * 
+     * @param ProductModel $productModel
+     * @param array $diffs
      * @return array
      */
-    private function generateUpdateLine(ExternalProduct $externalProduct, array $diffs): array
+    private function generateUpdateLine(ProductModel $productModel, array $diffs): array
     {
         $this->changeLines = [];
         
@@ -93,41 +93,37 @@ class CsvImportGenerator
 
         $name = $this->getDiffLineByKey(
             ProductDiffGenerator::FIELD_NAME,
-            $externalProduct->getProduct()->getName()
+            $productModel->getName()
         );
 
         $platform = $this->getDiffLineByKey(
             ProductDiffGenerator::FIELD_PLATFORMS,
-            ProductDiffGenerator::implodeArray($externalProduct->getProduct()->getPlatform())
+            ProductDiffGenerator::implodeArray($productModel->getPlatform())
         );
 
         $regions = $this->getDiffLineByKey(
             ProductDiffGenerator::FIELD_REGIONS,
-            ProductDiffGenerator::implodeArray($externalProduct->getProduct()->getRegions())
+            ProductDiffGenerator::implodeArray($productModel->getRegions())
         );
 
         $languages = $this->getDiffLineByKey(
             ProductDiffGenerator::FIELD_LANGUAGES,
-            ProductDiffGenerator::implodeArray($externalProduct->getProduct()->getLanguages())
+            ProductDiffGenerator::implodeArray($productModel->getLanguages())
         );
 
         $price = $this->getDiffLineByKey(
             ProductDiffGenerator::FIELD_PRICE,
-            $externalProduct->getProduct()->getLowestPrice()
+            $productModel->getPrice()
         );
 
         $stock = $this->getDiffLineByKey(
             ProductDiffGenerator::FIELD_STOCK,
-            $externalProduct->getProduct()->getStockQuantity()
+            $productModel->getQuantity()
         );
 
-        $cover = $this->getDiffLineByKey(
-            ProductDiffGenerator::FIELD_COVER,
-            $externalProduct->getProduct()->getImageUrl('MEDIUM')
-        );
 
         return [
-            (string) '"' . $externalProduct->getProduct()->getProductId() . '"',
+            (string) '"' . $productModel->getProductId() . '"',
             (string) '"' . 'Updated' . '"',
             (string) '"' . $name . '"',
             (string) '"' . $price . '"',
@@ -135,7 +131,6 @@ class CsvImportGenerator
             (string) '"' . $platform . '"',
             (string) '"' . $regions . '"',
             (string) '"' . $languages . '"',
-            (string) '"' . $cover . '"',
         ];
     }
     

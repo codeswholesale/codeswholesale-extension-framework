@@ -1,13 +1,14 @@
 <?php
 namespace CodesWholesaleFramework\Database\Repositories;
 
-use CodesWholesaleFramework\Database\Factories\ImportPropertyModelFactory;
-use CodesWholesaleFramework\Database\Models\ImportPropertyModel;
+use CodesWholesaleFramework\Database\Factories\PostbackImportModelFactory;
+use CodesWholesaleFramework\Database\Models\PostbackImportModel;
 
-class ImportPropertyRepository extends Repository {
+class PostbackImportRepository extends Repository {
     const
         FIELD_ID                    = 'id',
         FIELD_USER_ID               = 'user_id',
+        FIELD_EXTERNAL_ID           = 'external_id',
         FIELD_CREATED_AT            = 'created_at',
         FIELD_INSERT_COUNT          = 'insert_count',
         FIELD_UPDATE_COUNT          = 'update_count',
@@ -33,13 +34,14 @@ class ImportPropertyRepository extends Repository {
     ;
 
     /**
-     * @param ImportPropertyModel $model
+     * @param PostbackImportModel $model
      * @return bool
      */
-    public function save(ImportPropertyModel $model): bool
+    public function save(PostbackImportModel $model): bool
     {
         $result = $this->db->insert($this->getTableName(), [
             self::FIELD_USER_ID => $model->getUserId(),
+            self::FIELD_EXTERNAL_ID => $model->getExternalId(),
             self::FIELD_ACTION => $model->getAction(),
             self::FIELD_TYPE => $model->getType(),
             self::FIELD_IN_STOCK_DAYS_AGO => $model->getInStockDaysAgo(),
@@ -50,18 +52,17 @@ class ImportPropertyRepository extends Repository {
     }
 
     /**
-     * @param ImportPropertyModel $model
+     * @param PostbackImportModel $model
      * @return bool
      */
-    public function overwrite(ImportPropertyModel $model): bool
+    public function overwrite(PostbackImportModel $model): bool
     {
+ 
         $result = $this->db->update($this->getTableName(), [
             self::FIELD_USER_ID => $model->getUserId(),
+            self::FIELD_EXTERNAL_ID => $model->getExternalId(),
             self::FIELD_CREATED_AT => $model->getCreatedAt()->format('Y-m-d H:i:s'),
-            self::FIELD_INSERT_COUNT => $model->getInsertCount(),
-            self::FIELD_UPDATE_COUNT => $model->getUpdateCount(),
             self::FIELD_TOTAL_COUNT => $model->getTotalCount(),
-            self::FIELD_DONE_COUNT => $model->getDoneCount(),
             self::FIELD_STATUS => $model->getStatus(),
             self::FIELD_DESCRIPTION => $model->getDescription(),
         ], [
@@ -73,45 +74,45 @@ class ImportPropertyRepository extends Repository {
 
     /**
      * @param int $id
-     * @return ImportPropertyModel
+     * @return PostbackImportModel
      * @throws \Exception
      */
-    public function find(int $id): ImportPropertyModel
+    public function find(int $id): PostbackImportModel
     {
         $results = $this->db->get($this->getTableName(), [], [
             self::FIELD_ID => $id,
         ]);
 
         if (0 === count($results)) {
-            throw new \Exception('Import not found');
+            throw new \Exception('No result');
         }
 
         if (1 > count($results)) {
             throw new \Exception('Too much results');
         }
 
-        return ImportPropertyModelFactory::resolve((object) $results[0]);
+        return PostbackImportModelFactory::resolve((object) $results[0]);
     }
 
     /**
-     * @return ImportPropertyModel
+     * @return PostbackImportModel
      * @throws \Exception
      */
-    public function findActive(): ImportPropertyModel
+    public function findActive(): PostbackImportModel
     {
         $results = $this->db->get($this->getTableName(), [], [
-            self::FIELD_STATUS =>  [ImportPropertyModel::STATUS_NEW, ImportPropertyModel::STATUS_IN_PROGRESS]
+            self::FIELD_STATUS =>  [PostbackImportModel::STATUS_NEW, PostbackImportModel::STATUS_IN_PROGRESS, PostbackImportModel::STATUS_AWAITING]
         ], 'OR');
 
         if (0 === count($results)) {
-            throw new \Exception('Not found active import');
+            throw new \Exception('No result');
         }
 
         if (1 > count($results)) {
             throw new \Exception('Too much results');
         }
 
-        return ImportPropertyModelFactory::resolve((object) $results[0]);
+        return PostbackImportModelFactory::resolve((object) $results[0]);
     }
 
     /**
@@ -120,7 +121,7 @@ class ImportPropertyRepository extends Repository {
     public function isActive(): bool
     {
         $results = $this->db->get($this->getTableName(), [], [
-            self::FIELD_STATUS =>  [ImportPropertyModel::STATUS_NEW, ImportPropertyModel::STATUS_IN_PROGRESS]
+            self::FIELD_STATUS =>  [PostbackImportModel::STATUS_NEW, PostbackImportModel::STATUS_IN_PROGRESS, PostbackImportModel::STATUS_AWAITING]
         ], 'OR');
 
         if (0 === count($results)) {
@@ -141,17 +142,17 @@ class ImportPropertyRepository extends Repository {
         }
 
         foreach ($results as $item) {
-            $mappedResults[] = ImportPropertyModelFactory::resolve((object) $item);
+            $mappedResults[] = PostbackImportModelFactory::resolve((object) $item);
         }
 
         return $mappedResults;
     }
 
     /**
-     * @param ImportPropertyModel $model
+     * @param PostbackImportModel $model
      * @return bool
      */
-    public function delete(ImportPropertyModel $model): bool
+    public function delete(PostbackImportModel $model): bool
     {
         $result = $this->db->remove($this->getTableName(), [
             self::FIELD_ID => $model->getId(),
@@ -168,6 +169,7 @@ class ImportPropertyRepository extends Repository {
         $this->db->addTable($this->getTableName(), [
             self::FIELD_ID => 'INT NOT NULL AUTO_INCREMENT',
             self::FIELD_USER_ID => 'INT',
+            self::FIELD_EXTERNAL_ID => 'VARCHAR(100)',
             self::FIELD_CREATED_AT => 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
             self::FIELD_ACTION => 'VARCHAR(100)',
             self::FIELD_TYPE => 'VARCHAR(100)',
@@ -177,7 +179,7 @@ class ImportPropertyRepository extends Repository {
             self::FIELD_UPDATE_COUNT => 'INT NOT NULL DEFAULT 0',
             self::FIELD_TOTAL_COUNT => 'INT NOT NULL DEFAULT 0',
             self::FIELD_DONE_COUNT => 'INT NOT NULL DEFAULT 0',
-            self::FIELD_STATUS => 'VARCHAR(20) NOT NULL DEFAULT "' .  ImportPropertyModel::STATUS_NEW . '"',
+            self::FIELD_STATUS => 'VARCHAR(20) NOT NULL DEFAULT "' .  PostbackImportModel::STATUS_NEW . '"',
             self::FIELD_DESCRIPTION => 'TEXT',
         ], self::FIELD_ID);
 
@@ -189,6 +191,59 @@ class ImportPropertyRepository extends Repository {
      */
     protected function getName(): string
     {
-        return 'import_properties';
+        return 'postback_import_properties';
+    }
+    
+    public function increaseCreatedCount($id) {
+        $query = sprintf("UPDATE %s SET %s = %s + 1 WHERE  %s = %s",
+            $this->getTableName(),
+            self::FIELD_INSERT_COUNT,
+            self::FIELD_INSERT_COUNT,
+            self::FIELD_ID,
+            $id
+        );
+        
+        $result = $this->db->sql($query);
+        
+        return false === $result ? false : true;
+    }
+    
+    public function increaseUpdatedCount($id) {
+        $query = sprintf("UPDATE %s SET %s = %s + 1 WHERE  %s = %s",
+            $this->getTableName(),
+            self::FIELD_UPDATE_COUNT,
+            self::FIELD_UPDATE_COUNT,
+            self::FIELD_ID,
+            $id
+        );
+        
+        $result = $this->db->sql($query);
+        
+        return false === $result ? false : true;
+    }
+    
+    public function increaseDoneCount($id) {
+        $query = sprintf("UPDATE %s SET %s = %s + 1 WHERE  %s = %s",
+            $this->getTableName(),
+            self::FIELD_DONE_COUNT,
+            self::FIELD_DONE_COUNT,
+            self::FIELD_ID,
+            $id
+        );
+        
+        $result = $this->db->sql($query);
+        
+        return false === $result ? false : true;
+    }
+    
+    public function updateStatusInformation($id, $import) {
+        $result = $this->db->update($this->getTableName(), [
+            self::FIELD_STATUS => $import->getImportStatus(),
+            self::FIELD_DESCRIPTION => $import->getMessage(),
+        ], [
+            self::FIELD_ID => $id
+        ]);
+
+        return false === $result ? false : true;
     }
 }
