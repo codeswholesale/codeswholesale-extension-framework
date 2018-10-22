@@ -68,7 +68,7 @@ class PostbackImport
         
         $activeStatuses = [PostbackImportModel::STATUS_AWAITING, PostbackImportModel::STATUS_IN_PROGRESS];
         
-        return in_array($activeStatuses, $import->getImportStatus());
+        return in_array($import->getImportStatus(), $activeStatuses);
     }
 }
 
