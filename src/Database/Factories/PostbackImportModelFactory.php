@@ -36,7 +36,7 @@ class PostbackImportModelFactory
             return $model;
 
         } catch (\Exception $e) {
-            throw new \Requests_Exception('Bad request', 'invalid_request');
+            throw $e;
         }
     }
 
