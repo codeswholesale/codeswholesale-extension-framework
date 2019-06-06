@@ -7,7 +7,7 @@ namespace CodesWholesaleFramework\Api;
  */
 class Currency
 {
-    const API = 'https://free.currencyconverterapi.com/api/v5';
+    const API = 'https://free.currconv.com/api/v7';
     const MAX_REQUEST = 3;
     const REQUEST_SLEEP_TIME = 1;
 
@@ -22,7 +22,7 @@ class Currency
      */
     public static function getAllCurrencies()
     {
-        $content = @file_get_contents(self::API . "/currencies");
+        $content = @file_get_contents(self::API . "/currencies?apiKey=b2b0cbe2f18969bca470");
 
         if (!$content) {
             throw new \Exception("Currency provider is not responding.");
