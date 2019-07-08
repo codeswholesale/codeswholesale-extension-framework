@@ -10,6 +10,7 @@ class Currency
     const API = 'https://free.currconv.com/api/v7';
     const MAX_REQUEST = 3;
     const REQUEST_SLEEP_TIME = 1;
+    const API_KEY_QUERY = "apiKey=b2b0cbe2f18969bca470";
 
     private static $lastUsedCurrency = '';
     private static $lastUsedRate = '';
@@ -22,7 +23,7 @@ class Currency
      */
     public static function getAllCurrencies()
     {
-        $content = @file_get_contents(self::API . "/currencies?apiKey=b2b0cbe2f18969bca470");
+        $content = @file_get_contents(self::API . "/currencies?" . self::API_KEY_QUERY);
 
         if (!$content) {
             throw new \Exception("Currency provider is not responding.");
@@ -79,7 +80,7 @@ class Currency
     private static function convert($id) {
         $convert = "EUR_" . $id;
 
-        $content = @file_get_contents(self::API . "/convert?q=" . $convert);
+        $content = @file_get_contents(self::API . "/convert?q=" . $convert . "&" . self::API_KEY_QUERY);
 
         $result  = json_decode($content);
 
